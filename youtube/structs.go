@@ -6,6 +6,10 @@ type Playlist struct {
 		TotalResults int `json:"totalResults"`
 	}
 	Items []struct {
+		Snippet struct {
+			Title       string `json:"title"`
+			Description string `json:"Description"`
+		}
 		ContentDetails struct {
 			VideoID string `json:"videoId"`
 		} `json:"contentDetails"`
@@ -15,10 +19,23 @@ type Playlist struct {
 // Video datastructure for JSON unmarshalling and future ranking
 type Video struct {
 	Items []struct {
-		Statistics []struct {
-			ViewCount    int `json:"viewCount"`
-			LikeCount    int `json:"likeCount"`
-			DislikeCount int `json:"dislikeCount"`
+		ID         string `json:"id"`
+		Statistics struct {
+			ViewCount    string `json:"viewCount"`
+			LikeCount    string `json:"likeCount"`
+			DislikeCount string `json:"dislikeCount"`
+			CommentCount string `json:"commentCount"`
 		} `json:"statistics"`
 	} `json:"items"`
+}
+
+// VideoStatistics statistics of a singular playlist
+type VideoStatistics struct {
+	Key          string `header:"Key"`
+	Title        string `header:"Title"`
+	URL          string `header:"URL"`
+	ViewCount    string `header:"View count"`
+	LikeCount    string `header:"Like count"`
+	DislikeCount string `header:"Dislike count"`
+	CommentCount string `header:"Comment count"`
 }
