@@ -1,6 +1,6 @@
 package youtube
 
-// Video details of a single Youtube playlist item
-func Video(playlistKey string) {
+// RankedVideo details of a single Youtube playlist item for ranking
+func RankedVideo(playlistKey string) {
 
 }
