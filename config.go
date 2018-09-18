@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/viper"
@@ -22,4 +24,16 @@ func configuration() Configuration {
 	c.apikey = v.GetString("apikey")
 
 	return c
+}
+
+// Getting playlist key from CLI
+func playlistKey() string {
+	var (
+		playlistKey = flag.String("p", "", "Youtube playlist key")
+	)
+	flag.Parse()
+	if *playlistKey == "" {
+		log.Fatalln("Playlist key must be defined")
+	}
+	return *playlistKey
 }
