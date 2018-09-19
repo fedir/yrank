@@ -14,9 +14,11 @@ To install the package :
 
 ## Usage
 
-IMPORTANT: You should have a Youtube API key to use the application. You could crate it at [Google Developers Console](https://console.developers.google.com/).
+IMPORTANT: You should have a Youtube API key to use the application. You could crуate it at [Google Developers Console](https://console.developers.google.com/).
 
-To launch the application You should just precise the ID of the playlist (could be found in the URL of the playlist, as "?playlistId=").
+After that, please copy ```config.example.toml``` to ```config.toml``` in the application folder and define Your Youtube API key there.
+
+To launch the application You should just precise the ID of the playlist via CLI (this ID could be found in the URL of the playlist, it's the "?playlistId=" variable value).
 
     yrank -p PLAYLIST-ID
 
