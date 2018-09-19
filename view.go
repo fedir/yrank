@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/fedir/yrank/youtube"
 	"github.com/olekukonko/tablewriter"
@@ -24,10 +25,10 @@ func print(vs []youtube.VideoStatistics) {
 				[]string{
 					vsi.Title,
 					vsi.URL,
-					vsi.ViewCount,
-					vsi.LikeCount,
-					vsi.DislikeCount,
-					vsi.CommentCount,
+					strconv.Itoa(vsi.ViewCount),
+					strconv.Itoa(vsi.LikeCount),
+					strconv.Itoa(vsi.DislikeCount),
+					strconv.Itoa(vsi.CommentCount),
 				},
 			)
 		}

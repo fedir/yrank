@@ -3,6 +3,7 @@ package youtube
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 	"sync"
 )
 
@@ -28,10 +29,10 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 	for _, item := range video.Items {
 		vs.Key = item.ID
 		vs.URL = "https://www.youtube.com/watch?v=" + item.ID
-		vs.ViewCount = item.Statistics.ViewCount
-		vs.LikeCount = item.Statistics.LikeCount
-		vs.DislikeCount = item.Statistics.DislikeCount
-		vs.CommentCount = item.Statistics.CommentCount
+		vs.ViewCount, _ = strconv.Atoi(item.Statistics.ViewCount)
+		vs.LikeCount, _ = strconv.Atoi(item.Statistics.LikeCount)
+		vs.DislikeCount, _ = strconv.Atoi(item.Statistics.DislikeCount)
+		vs.CommentCount, _ = strconv.Atoi(item.Statistics.CommentCount)
 		vs.Title = title
 
 		// Total views

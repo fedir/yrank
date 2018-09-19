@@ -35,5 +35,7 @@ func PlaylistStatistics(playlistKey string, apiKey string) []VideoStatistics {
 	}
 	wg.Wait()
 
+	sortByLikes(playlistStatistic)
+
 	return playlistStatistic
 }

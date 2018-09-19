@@ -34,8 +34,8 @@ type VideoStatistics struct {
 	Key          string `header:"Key"`
 	Title        string `header:"Title"`
 	URL          string `header:"URL"`
-	ViewCount    string `header:"View count"`
-	LikeCount    string `header:"Like count"`
-	DislikeCount string `header:"Dislike count"`
-	CommentCount string `header:"Comment count"`
+	ViewCount    int    `header:"View count"`
+	LikeCount    int    `header:"Like count"`
+	DislikeCount int    `header:"Dislike count"`
+	CommentCount int    `header:"Comment count"`
 }
