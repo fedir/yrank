@@ -1,6 +1,9 @@
 package youtube
 
 import (
+	"bufio"
+	"bytes"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -38,4 +41,19 @@ func statusProcessing(statusCode int, url string) {
 	} else if statusCode != 200 {
 		log.Fatalf("The status code of URL %s is not OK : %d", url, statusCode)
 	}
+}
+
+// ReadResp :  reads response from HTTP query.
+func readResp(fullResp []byte) ([]byte, string, error) {
+	r := bufio.NewReader(bytes.NewReader(fullResp))
+	resp, err := http.ReadResponse(r, nil)
+	if err != nil {
+		log.Printf("%v\n%s", err, fullResp)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("%v\n%s", err, resp.Body)
+	}
+	linkHeader := resp.Header.Get("Link")
+	return body, linkHeader, err
 }
