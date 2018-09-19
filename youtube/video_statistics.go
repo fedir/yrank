@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"encoding/json"
+	"log"
 	"sync"
 )
 
@@ -17,7 +18,10 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 	if err != nil {
 		panic(err)
 	}
-	jsonResponse, _, _ := readResp(resp)
+	jsonResponse, _, err := readResp(resp)
+	if err != nil {
+		log.Println(err)
+	}
 	video := Video{}
 	json.Unmarshal(jsonResponse, &video)
 

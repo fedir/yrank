@@ -32,7 +32,10 @@ func PlaylistStatistics(playlistKey string, apiKey string) []VideoStatistics {
 		go videoStatistics(video.ContentDetails.VideoID, video.Snippet.Title, apiKey, dataChan, &wg)
 	}
 	for range playlist.Items {
-		playlistStatistic = append(playlistStatistic, <-dataChan)
+		vs := <-dataChan
+		if vs.Title != "" {
+			playlistStatistic = append(playlistStatistic, vs)
+		}
 	}
 	wg.Wait()
 
