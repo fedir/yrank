@@ -19,10 +19,6 @@ func PlaylistStatistics(playlistKey string, apiKey string) []VideoStatistics {
 	playlist := Playlist{}
 	json.Unmarshal(jsonResponse, &playlist)
 
-	for _, item := range playlist.Items {
-		fmt.Println(item.ContentDetails.VideoID)
-	}
-
 	var playlistStatistic = []VideoStatistics{}
 	var wg sync.WaitGroup
 	wg.Add(len(playlist.Items))
