@@ -6,8 +6,8 @@ import (
 	"sync"
 )
 
-// RankedPlaylist returns ranked playlist
-func RankedPlaylist(playlistKey string, apiKey string) string {
+// PlaylistStatistics returns videos statistics of a Youtube playlist
+func PlaylistStatistics(playlistKey string, apiKey string) []VideoStatistics {
 	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&maxResults=50&part=snippet%2CcontentDetails&key=" + apiKey
 	fmt.Printf("Playlist URL: %s\n", url)
 
@@ -36,10 +36,5 @@ func RankedPlaylist(playlistKey string, apiKey string) string {
 	}
 	wg.Wait()
 
-	fmt.Printf("%v#", playlistStatistic)
-
-	//rateAndPrintGreetings(playlistStatistic)
-	//writeCSVStatistics(playlistStatistic, csvFilePath)
-
-	return "RankedPlaylist"
+	return playlistStatistic
 }

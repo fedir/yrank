@@ -11,6 +11,9 @@ func main() {
 	fmt.Printf("API key: %s\n", c.apikey)
 	pk := playlistKey()
 	fmt.Printf("Playlist key: %s\n", pk)
-	rankedPlaylist := youtube.RankedPlaylist(pk, c.apikey)
-	fmt.Printf("%v#", rankedPlaylist)
+	ps := youtube.PlaylistStatistics(pk, c.apikey)
+	print(ps)
+
+	//rateStatistics(playlistStatistic)
+	//writeCSVStatistics(playlistStatistic, csvFilePath)
 }
