@@ -24,6 +24,11 @@ To launch the application You should just precise the ID of the playlist (could 
 
     ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM
 
+### Results samples
+
+* Ranking of GopherCon 2018 videos https://gist.github.com/fedir/98f6a2ed65e7462a101198dc6f3d5185
+* Ranking of GopherCon UK 2018 videos https://gist.github.com/fedir/6a93e91fa414df6484ba04589ed3269a
+
 ---
 
 # TBD
