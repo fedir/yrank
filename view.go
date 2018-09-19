@@ -19,8 +19,18 @@ func print(vs []youtube.VideoStatistics) {
 	table.SetHeader([]string{"Title", "URL", "Views", "Likes", "Dislikes", "Comments"})
 
 	for _, vsi := range vs {
-		v := []string{vsi.Title, vsi.URL, vsi.ViewCount, vsi.LikeCount, vsi.DislikeCount, vsi.CommentCount}
-		table.Append(v)
+		if vsi.Title != "" {
+			table.Append(
+				[]string{
+					vsi.Title,
+					vsi.URL,
+					vsi.ViewCount,
+					vsi.LikeCount,
+					vsi.DislikeCount,
+					vsi.CommentCount,
+				},
+			)
+		}
 	}
 	table.Render() // Send output
 }
