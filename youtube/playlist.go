@@ -71,10 +71,13 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 		vs.CommentCount = item.Statistics.CommentCount
 		vs.Title = title
 
-		// Coefficient of likes / dislikes
-		// Proportion of views / likes-dislikes
-		// Total reaction coefficient
+		// Total views
 		// Total likes
+		// Total dislikes
+		// Total comments
+		// Global rating coefficient of likes / dislikes
+		// Relative Most rated (Proportion of views / likes-dislikes)
+		// Total reaction coefficient
 	}
 
 	dataChan <- *vs
