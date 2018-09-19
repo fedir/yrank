@@ -2,6 +2,32 @@
 
 Package which helps You to priorize a Youtube's playlist items for watching.
 
+It could be quite helpful, when You would like to choose the most interesting videos of an IT conference.
+
+## Installation
+
+golang 1.10+ should be installed. Go environment [is very simple to install](https://golang.org/doc/install).
+
+To install the package :
+
+    go get -u yrank
+
+## Usage
+
+IMPORTANT: You should have a Youtube API key to use the application. You could crate it at [Google Developers Console](https://console.developers.google.com/).
+
+To launch the application You should just precise the ID of the playlist (could be found in the URL of the playlist, as "?playlistId=").
+
+    yrank -p PLAYLIST-ID
+
+### Example
+
+    ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM
+
+---
+
+# TBD
+
 ## Interestingness coefficient formula
 
     Ci = (Nviews + Nlikes - Ndislikes + Nuniqcomments) / Nviews
@@ -32,22 +58,6 @@ We could notice, what if the video has not at all any likes, the coefficient is 
 ### Coefficient optimization
 
 Also it's possible in future versions of yrank to make coefficients and formula to be configured through the configuration system, so everybody could choose his own coefficients. At the moment we'll keep simple solution.
-
-## Installation
-
-    go get -u yrank
-
-## Usage
-
-IMPORTANT: You should have a Youtube API key to use the application. You could crate it at [Google Developers Console](https://console.developers.google.com/).
-
-To launch the application You should use
-
-    yrank PLAYLIST-ID
-
-Or :
-
-    yrank PLAYLIST-URL
 
 ## Advanced configuration
 
