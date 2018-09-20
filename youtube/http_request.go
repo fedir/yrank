@@ -34,11 +34,12 @@ func httpRequest(url string) ([]byte, int, error) {
 }
 
 func statusProcessing(statusCode int, url string) {
-	if statusCode == 403 {
+	switch statusCode {
+	case http.StatusForbidden:
 		log.Fatalf("Looks like the rate limit is exceeded, please try again later")
-	} else if statusCode == 202 {
+	case http.StatusAccepted:
 		log.Printf("Looks like the server need some time to prepare request.")
-	} else if statusCode != 200 {
+	case http.StatusOK:
 		log.Fatalf("The status code of URL %s is not OK : %d", url, statusCode)
 	}
 }
