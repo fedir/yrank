@@ -26,14 +26,18 @@ func configuration() Configuration {
 	return c
 }
 
-// Getting playlist key from CLI
-func playlistKey() string {
+// Getting parameters from CLI
+func cliParameters() (string, string) {
 	var (
 		playlistKey = flag.String("p", "", "Youtube playlist key")
+		output      = flag.String("o", "table", "Output format")
 	)
 	flag.Parse()
 	if *playlistKey == "" {
 		log.Fatalln("Playlist key must be defined")
 	}
-	return *playlistKey
+	if *output != "table" && *output != "markdown" {
+		log.Fatalln("Output format unknown")
+	}
+	return *playlistKey, *output
 }
