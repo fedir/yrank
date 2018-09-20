@@ -10,7 +10,7 @@ golang 1.10+ should be installed. Go environment [is very simple to install](htt
 
 To install the package :
 
-    go get -u yrank
+    go get -u github.com/fedir/yrank
 
 ## Usage
 
