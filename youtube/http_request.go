@@ -39,6 +39,8 @@ func statusProcessing(statusCode int, url string) {
 		log.Fatalf("Looks like the rate limit is exceeded, please try again later")
 	case http.StatusAccepted:
 		log.Printf("Looks like the server need some time to prepare request.")
+	case http.StatusOK:
+		return
 	default:
 		log.Fatalf("The status code of URL %s is not OK : %d", url, statusCode)
 	}
