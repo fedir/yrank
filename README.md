@@ -22,6 +22,10 @@ To launch the application You should just precise the ID of the playlist via CLI
 
     yrank -p PLAYLIST-ID
 
+To output ranking in markdown:
+
+    yrank -p PLAYLIST-ID -o markdown
+
 ### Example
 
     ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM
