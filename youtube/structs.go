@@ -2,7 +2,8 @@ package youtube
 
 // Playlist datastructure for JSON unmarshalling
 type Playlist struct {
-	PageInfo struct {
+	NextPageToken string `json:"nextPageToken"`
+	PageInfo      struct {
 		TotalResults int `json:"totalResults"`
 	}
 	Items []struct {

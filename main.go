@@ -11,7 +11,7 @@ func main() {
 	fmt.Printf("API key: %s\n", c.apikey)
 	pk, of, s := cliParameters()
 	fmt.Printf("Playlist key: %s\n", pk)
-	ps := youtube.PlaylistStatistics(pk, c.apikey)
+	ps := youtube.PlaylistStatistics(pk, c.apikey, "")
 	if s == "likes" {
 		youtube.SortByLikes(ps)
 	} else if s == "total-interest" {
