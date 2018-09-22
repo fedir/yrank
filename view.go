@@ -28,11 +28,11 @@ func print(vs []youtube.VideoStatistics, of string) {
 	table.SetHeader([]string{
 		"Title",
 		"URL",
+		"Likes",
 		"Positive interestingness",
 		"Total interestingness",
 		"Global buzz",
 		"Views",
-		"Likes",
 		"Dislikes",
 		"Comments",
 	})
@@ -43,11 +43,11 @@ func print(vs []youtube.VideoStatistics, of string) {
 				[]string{
 					vsi.Title,
 					vsi.URL,
+					strconv.Itoa(vsi.LikeCount),
 					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
 					fmt.Sprintf("%.4f", vsi.TotalInterestingness),
 					strconv.Itoa(vsi.GlobalBuzz),
 					strconv.Itoa(vsi.ViewCount),
-					strconv.Itoa(vsi.LikeCount),
 					strconv.Itoa(vsi.DislikeCount),
 					strconv.Itoa(vsi.CommentCount),
 				},

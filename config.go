@@ -27,10 +27,11 @@ func configuration() Configuration {
 }
 
 // Getting parameters from CLI
-func cliParameters() (string, string) {
+func cliParameters() (string, string, string) {
 	var (
 		playlistKey = flag.String("p", "", "Youtube playlist key")
 		output      = flag.String("o", "table", "Output format")
+		sorting     = flag.String("s", "likes", "Sorting")
 	)
 	flag.Parse()
 	if *playlistKey == "" {
@@ -39,5 +40,8 @@ func cliParameters() (string, string) {
 	if *output != "table" && *output != "markdown" {
 		log.Fatalln("Output format unknown")
 	}
-	return *playlistKey, *output
+	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" {
+		log.Fatalln("Unknown sorting column")
+	}
+	return *playlistKey, *output, *sorting
 }
