@@ -1,5 +1,16 @@
 package youtube
 
+// Channel datastructure for JSON unmarshalling
+type Channel struct {
+	NextPageToken string `json:"nextPageToken"`
+	PageInfo      struct {
+		TotalResults int `json:"totalResults"`
+	}
+	Items []struct {
+		PlaylistID string `json:"id"`
+	} `json:"items"`
+}
+
 // Playlist datastructure for JSON unmarshalling
 type Playlist struct {
 	NextPageToken string `json:"nextPageToken"`
