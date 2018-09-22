@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -24,7 +25,17 @@ func print(vs []youtube.VideoStatistics, of string) {
 		table.SetAutoWrapText(false)
 	}
 
-	table.SetHeader([]string{"Title", "URL", "Views", "Likes", "Dislikes", "Comments"})
+	table.SetHeader([]string{
+		"Title",
+		"URL",
+		"Positive interestingness",
+		"Total interestingness",
+		"Global buzz",
+		"Views",
+		"Likes",
+		"Dislikes",
+		"Comments",
+	})
 
 	for _, vsi := range vs {
 		if vsi.Title != "" {
@@ -32,6 +43,9 @@ func print(vs []youtube.VideoStatistics, of string) {
 				[]string{
 					vsi.Title,
 					vsi.URL,
+					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
+					fmt.Sprintf("%.4f", vsi.TotalInterestingness),
+					strconv.Itoa(vsi.GlobalBuzz),
 					strconv.Itoa(vsi.ViewCount),
 					strconv.Itoa(vsi.LikeCount),
 					strconv.Itoa(vsi.DislikeCount),

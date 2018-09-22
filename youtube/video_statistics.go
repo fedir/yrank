@@ -34,14 +34,9 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 		vs.DislikeCount, _ = strconv.Atoi(item.Statistics.DislikeCount)
 		vs.CommentCount, _ = strconv.Atoi(item.Statistics.CommentCount)
 		vs.Title = title
-
-		// Total views
-		// Total likes
-		// Total dislikes
-		// Total comments
-		// Global rating coefficient of likes / dislikes
-		// Relative Most rated (Proportion of views / likes-dislikes)
-		// Total reaction coefficient
+		vs.PositiveInterestingness = float64(vs.LikeCount-vs.DislikeCount) / float64(vs.ViewCount)
+		vs.TotalInterestingness = float64(vs.LikeCount+vs.DislikeCount+vs.CommentCount) / float64(vs.ViewCount)
+		vs.GlobalBuzz = vs.ViewCount + vs.CommentCount
 	}
 
 	dataChan <- *vs

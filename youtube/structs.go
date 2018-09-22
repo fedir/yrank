@@ -31,11 +31,14 @@ type Video struct {
 
 // VideoStatistics statistics of a singular playlist
 type VideoStatistics struct {
-	Key          string `header:"Key"`
-	Title        string `header:"Title"`
-	URL          string `header:"URL"`
-	ViewCount    int    `header:"View count"`
-	LikeCount    int    `header:"Like count"`
-	DislikeCount int    `header:"Dislike count"`
-	CommentCount int    `header:"Comment count"`
+	Key                     string  `header:"Key"`
+	Title                   string  `header:"Title"`
+	URL                     string  `header:"URL"`
+	ViewCount               int     `header:"View count"`
+	LikeCount               int     `header:"Like count"`
+	DislikeCount            int     `header:"Dislike count"`
+	CommentCount            int     `header:"Comment count"`
+	PositiveInterestingness float64 `header:"Positive interestingness"`
+	GlobalBuzz              int     `header:"Global buzz"`
+	TotalInterestingness    float64 `header:"Total interestingness"`
 }
