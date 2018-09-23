@@ -18,6 +18,20 @@ IMPORTANT: You should have a Youtube API key to use the application. You could c
 
 After that, please copy ```config.example.toml``` to ```config.toml``` in the application folder and define Your Youtube API key there.
 
+### CLI options
+
+    Usage of ./yrank:
+    -p string
+            Youtube playlist ID
+    -c string
+            Youtube channel ID
+    -s string
+        Sorting (default "likes", could be "positive-interest", "total-reaction")
+    -o string
+            Output format (default "table", could be "markdown")
+
+### Getting single playlist statistics
+
 To launch the application You should just precise the ID of the playlist via CLI (this ID could be found in the URL of the playlist, it's the "?playlistId=" variable value).
 
     yrank -p PLAYLIST-ID
@@ -25,6 +39,16 @@ To launch the application You should just precise the ID of the playlist via CLI
 To output ranking in markdown:
 
     yrank -p PLAYLIST-ID -o markdown
+
+### Getting the statistics of a whole user's channel
+
+First of all, You must find the channel ID, You need. Somtimes it's in URL of Youtube's user profile, sometimes, You should look for it in the code of the page.
+
+#### Examples
+
+    yrank -c CHANNEL-ID
+
+    yrank -c CHANNEL-ID -o markdown -s positive-interest
 
 ### Example
 
