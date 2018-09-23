@@ -46,14 +46,13 @@ To output ranking in markdown:
 
 First of all, You must find the channel ID of the user. It's not always that easy. Sometimes it's in URL of Youtube's user profile. Sometimes, You should look for it in the code of the page.
 
-#### Examples
-
     yrank -c CHANNEL-ID
     yrank -c CHANNEL-ID -o markdown -s positive-interest
 
-### Example
+### Examples
 
     ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM
+    ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM -o markdown -s positive-interest
 
 ### Results samples
 
