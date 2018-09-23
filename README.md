@@ -29,6 +29,8 @@ After that, please copy ```config.example.toml``` to ```config.toml``` in the ap
         Sorting (default "likes", could be "positive-interest", "total-reaction")
     -o string
             Output format (default "table", could be "markdown")
+    -d bool
+            Debug mode for more details during API exchange
 
 ### Getting single playlist statistics
 
@@ -42,12 +44,11 @@ To output ranking in markdown:
 
 ### Getting the statistics of a whole user's channel
 
-First of all, You must find the channel ID, You need. Somtimes it's in URL of Youtube's user profile, sometimes, You should look for it in the code of the page.
+First of all, You must find the channel ID of the user. It's not always that easy. Sometimes it's in URL of Youtube's user profile. Sometimes, You should look for it in the code of the page.
 
 #### Examples
 
     yrank -c CHANNEL-ID
-
     yrank -c CHANNEL-ID -o markdown -s positive-interest
 
 ### Example
