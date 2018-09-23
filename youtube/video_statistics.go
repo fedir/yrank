@@ -35,7 +35,7 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 		vs.CommentCount, _ = strconv.Atoi(item.Statistics.CommentCount)
 		vs.Title = title
 		vs.PositiveInterestingness = float64(vs.LikeCount-vs.DislikeCount) / float64(vs.ViewCount)
-		vs.TotalInterestingness = float64(vs.LikeCount+vs.DislikeCount+vs.CommentCount) / float64(vs.ViewCount)
+		vs.TotalReaction = float64(vs.LikeCount+vs.DislikeCount+vs.CommentCount) / float64(vs.ViewCount)
 		vs.GlobalBuzz = vs.ViewCount + vs.CommentCount
 	}
 

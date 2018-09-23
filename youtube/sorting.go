@@ -16,9 +16,9 @@ func SortByPositiveInterestingness(vs []VideoStatistics) {
 	})
 }
 
-// SortByTotalInterestingness sorts videos by it's total interestingness
+// SortByTotalInterestingness sorts videos by it's total reaction
 func SortByTotalInterestingness(vs []VideoStatistics) {
 	sort.Slice(vs[:], func(i, j int) bool {
-		return vs[i].TotalInterestingness > vs[j].TotalInterestingness
+		return vs[i].TotalReaction > vs[j].TotalReaction
 	})
 }
