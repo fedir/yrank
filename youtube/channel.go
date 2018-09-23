@@ -6,7 +6,7 @@ import (
 )
 
 // ChannelStatistics returns videos statistics of a Youtube channel
-func ChannelStatistics(cid string, apiKey string) []VideoStatistics {
+func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics {
 
 	var channelVideos = []VideoStatistics{}
 
@@ -22,8 +22,10 @@ func ChannelStatistics(cid string, apiKey string) []VideoStatistics {
 	json.Unmarshal(jsonResponse, &channel)
 
 	for _, pl := range channel.Items {
-		fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
-		playlistVideos := PlaylistStatistics(pl.PlaylistID, apiKey, "")
+		if debug {
+			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
+		}
+		playlistVideos := PlaylistStatistics(pl.PlaylistID, apiKey, "", debug)
 		channelVideos = append(channelVideos, playlistVideos...)
 	}
 

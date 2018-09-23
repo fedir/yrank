@@ -10,17 +10,23 @@ func main() {
 
 	// Getting configuration from configuration files and from CLI parameters
 	c := configuration()
-	fmt.Printf("API key: %s\n", c.apikey)
-	cid, pid, of, s := cliParameters()
+	cid, pid, of, s, d := cliParameters()
+	if d {
+		fmt.Printf("API key: %s\n", c.apikey)
+	}
 
 	// Statistics retrieve from Youtube
 	var rankedVideos []youtube.VideoStatistics
 	if cid != "" {
-		fmt.Printf("Channel ID: %s\n", cid)
-		rankedVideos = youtube.ChannelStatistics(cid, c.apikey)
+		if d {
+			fmt.Printf("Channel ID: %s\n", cid)
+		}
+		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, d)
 	} else if pid != "" {
-		fmt.Printf("Playlist ID: %s\n", pid)
-		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "")
+		if d {
+			fmt.Printf("Playlist ID: %s\n", pid)
+		}
+		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
 	}
 
 	// Sorting
