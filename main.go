@@ -21,17 +21,17 @@ func main() {
 		if d {
 			fmt.Printf("Channel ID: %s\n", cid)
 		}
-		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, d)
+		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, c.maxResults, d)
 	} else if pid != "" {
 		if d {
 			fmt.Printf("Playlist ID: %s\n", pid)
 		}
-		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
+		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", c.maxResults, d)
 	}
 
 	// Sorting
 	youtube.SortBy(rankedVideos, s)
-	if n >= 0 && n <= len(rankedVideos) {
+	if n > 0 && n <= len(rankedVideos) {
 		rankedVideos = rankedVideos[:n]
 	}
 	print(rankedVideos, of)

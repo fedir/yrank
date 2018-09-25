@@ -6,11 +6,11 @@ import (
 )
 
 // ChannelStatistics returns videos statistics of a Youtube channel
-func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics {
+func ChannelStatistics(cid string, apiKey string, maxResult string, debug bool) []VideoStatistics {
 
 	var channelVideos = []VideoStatistics{}
 
-	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&maxResults=50&part=id&key=" + apiKey
+	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&maxResults=" + maxResult + "&part=id&key=" + apiKey
 
 	resp, _, err := httpRequest(url)
 	if err != nil {
@@ -25,7 +25,7 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 		if debug {
 			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
 		}
-		playlistVideos := PlaylistStatistics(pl.PlaylistID, apiKey, "", debug)
+		playlistVideos := PlaylistStatistics(pl.PlaylistID, apiKey, "", maxResult, debug)
 		channelVideos = append(channelVideos, playlistVideos...)
 	}
 

@@ -23,6 +23,7 @@ func configuration() Configuration {
 	}
 
 	c.apikey = v.GetString("apikey")
+	c.maxResults = v.GetString("maxresults")
 
 	return c
 }
