@@ -2,6 +2,5 @@ package main
 
 // Configuration global container
 type Configuration struct {
-	apikey     string
-	maxResults string
+	apikey string
 }
