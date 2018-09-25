@@ -10,7 +10,7 @@ func main() {
 
 	// Getting configuration from configuration files and from CLI parameters
 	c := configuration()
-	cid, pid, of, s, d := cliParameters()
+	cid, pid, of, s, n, d := cliParameters()
 	if d {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
@@ -30,13 +30,9 @@ func main() {
 	}
 
 	// Sorting
-	if s == "likes" {
-		youtube.SortByLikes(rankedVideos)
-	} else if s == "total-interest" {
-		youtube.SortByTotalInterestingness(rankedVideos)
-	} else if s == "positive-interest" {
-		youtube.SortByPositiveInterestingness(rankedVideos)
+	youtube.SortBy(rankedVideos, s)
+	if n >= 0 && n <= len(rankedVideos) {
+		rankedVideos = rankedVideos[:n]
 	}
-
 	print(rankedVideos, of)
 }

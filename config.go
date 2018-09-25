@@ -28,12 +28,13 @@ func configuration() Configuration {
 }
 
 // Getting parameters from CLI
-func cliParameters() (string, string, string, string, bool) {
+func cliParameters() (string, string, string, string, int, bool) {
 	var (
 		playlistID = flag.String("p", "", "Youtube playlist ID")
 		channelID  = flag.String("c", "", "Youtube channel ID")
 		output     = flag.String("o", "table", "Output format")
 		sorting    = flag.String("s", "likes", "Sorting")
+		onPage     = flag.Int("n", 0, "Count of items to show")
 		debug      = flag.Bool("d", false, "Debug mode")
 	)
 	flag.Parse()
@@ -48,5 +49,5 @@ func cliParameters() (string, string, string, string, bool) {
 	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" {
 		log.Fatalln("Unknown sorting column")
 	}
-	return *channelID, *playlistID, *output, *sorting, *debug
+	return *channelID, *playlistID, *output, *sorting, *onPage, *debug
 }

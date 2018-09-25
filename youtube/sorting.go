@@ -2,23 +2,20 @@ package youtube
 
 import "sort"
 
-// SortByLikes sorts videos by it's likes
-func SortByLikes(vs []VideoStatistics) {
-	sort.Slice(vs[:], func(i, j int) bool {
-		return vs[i].LikeCount > vs[j].LikeCount
-	})
-}
-
-// SortByPositiveInterestingness sorts videos by it's positive (ignoring negative) interestingness
-func SortByPositiveInterestingness(vs []VideoStatistics) {
-	sort.Slice(vs[:], func(i, j int) bool {
-		return vs[i].PositiveInterestingness > vs[j].PositiveInterestingness
-	})
-}
-
-// SortByTotalInterestingness sorts videos by it's total reaction
-func SortByTotalInterestingness(vs []VideoStatistics) {
-	sort.Slice(vs[:], func(i, j int) bool {
-		return vs[i].TotalReaction > vs[j].TotalReaction
-	})
+//SortBy sorts videos by some params
+func SortBy(vs []VideoStatistics, how string) {
+	switch how {
+	case "total-interest":
+		sort.Slice(vs[:], func(i, j int) bool {
+			return vs[i].TotalReaction > vs[j].TotalReaction
+		})
+	case "positive-interest":
+		sort.Slice(vs[:], func(i, j int) bool {
+			return vs[i].PositiveInterestingness > vs[j].PositiveInterestingness
+		})
+	default:
+		sort.Slice(vs[:], func(i, j int) bool {
+			return vs[i].LikeCount > vs[j].LikeCount
+		})
+	}
 }
