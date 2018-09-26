@@ -10,9 +10,9 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 
 	var channelVideos = []VideoStatistics{}
 
-	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&key=" + apiKey
+	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
 
-	resp, _, err := httpRequest(url)
+	resp, _, err := HttpRequest(url)
 	if err != nil {
 		panic(err)
 	}
