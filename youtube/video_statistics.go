@@ -2,18 +2,23 @@ package youtube
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"sync"
 )
 
-func videoStatistics(vid string, title string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup) {
+func videoStatistics(vid string, title string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup, debug bool) {
 
 	defer wg.Done()
 
 	vs := new(VideoStatistics)
 
 	url := "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=" + vid + "&key=" + apiKey
+
+	if debug {
+		fmt.Printf("Video URL: %s\n", url)
+	}
 
 	resp, _, err := httpRequest(url)
 	if err != nil {
