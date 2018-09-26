@@ -8,6 +8,8 @@ import (
 
 // PlaylistStatistics returns videos statistics of a Youtube playlist
 func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, debug bool) []VideoStatistics {
+
+	// Prepare URL
 	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&part=snippet%2CcontentDetails&key=" + apiKey
 	if pageToken != "" {
 		url = url + "&pageToken=" + pageToken
@@ -16,6 +18,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 		fmt.Printf("Playlist URL: %s\n", url)
 	}
 
+	// Get playlist
 	resp, _, err := httpRequest(url)
 	if err != nil {
 		panic(err)
@@ -24,6 +27,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 	playlist := Playlist{}
 	json.Unmarshal(jsonResponse, &playlist)
 
+	// Get each video statistics
 	var playlistStatistic = []VideoStatistics{}
 	var wg sync.WaitGroup
 	wg.Add(len(playlist.Items))
@@ -40,6 +44,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 	}
 	wg.Wait()
 
+	// If more than 1 page of videos in playlist, append additional videos from next pages
 	if playlist.NextPageToken != "" {
 		nextPagePlaylistStatistics := PlaylistStatistics(playlistKey, apiKey, playlist.NextPageToken, debug)
 		playlistStatistic = append(playlistStatistic, nextPagePlaylistStatistics...)
