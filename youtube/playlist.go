@@ -10,7 +10,7 @@ import (
 func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, debug bool) []VideoStatistics {
 
 	// Prepare URL
-	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&part=snippet%2CcontentDetails&key=" + apiKey
+	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&maxResults=50&part=snippet%2CcontentDetails&key=" + apiKey
 	if pageToken != "" {
 		url = url + "&pageToken=" + pageToken
 	}
@@ -19,13 +19,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 	}
 
 	// Get playlist
-	resp, _, err := httpRequest(url)
-	if err != nil {
-		panic(err)
-	}
-	jsonResponse, _, _ := readResp(resp)
-	playlist := Playlist{}
-	json.Unmarshal(jsonResponse, &playlist)
+	playlist := playlist(url)
 
 	// Get each video statistics
 	var playlistStatistic = []VideoStatistics{}
@@ -51,4 +45,16 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 	}
 
 	return playlistStatistic
+}
+
+func playlist(url string) Playlist {
+	// Get playlist
+	resp, _, err := httpRequest(url)
+	if err != nil {
+		panic(err)
+	}
+	jsonResponse, _ := readResp(resp)
+	playlist := Playlist{}
+	json.Unmarshal(jsonResponse, &playlist)
+	return playlist
 }

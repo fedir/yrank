@@ -1,0 +1,256 @@
+{
+    "kind": "youtube#playlistItemListResponse",
+    "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/eEkV7IlN0Ki__1GEI7lwSbGwxnM\"",
+    "nextPageToken": "CAUQAA",
+    "pageInfo": {
+     "totalResults": 30,
+     "resultsPerPage": 5
+    },
+    "items": [
+     {
+      "kind": "youtube#playlistItem",
+      "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/doRvdT00k2fAbC16rQx7rqHtGwo\"",
+      "id": "UExEV1o1dXpuNjlld3NNeXVHalZzQW5wUUlqeXVkMUN2OS41NkI0NEY2RDEwNTU3Q0M2",
+      "snippet": {
+       "publishedAt": "2018-08-21T20:55:34.000Z",
+       "channelId": "UC9ZNrGdT2aAdrNbX78lbNlQ",
+       "title": "GopherCon UK 2018: Aditya Mukerjee - You Might Be a Go Contributor Already and Not Know It",
+       "description": "Contributing to Go is more than just writing code for the compiler and standard library. Between other official Go projects, third-party projects, articles, workshops, and conference talks, you can even be a contributor to Go without ever even signing up for a Gerrit account.",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/2mgKDqD5Ga8/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/2mgKDqD5Ga8/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/2mgKDqD5Ga8/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/2mgKDqD5Ga8/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/2mgKDqD5Ga8/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "GopherCon UK",
+       "playlistId": "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9",
+       "position": 0,
+       "resourceId": {
+        "kind": "youtube#video",
+        "videoId": "2mgKDqD5Ga8"
+       }
+      },
+      "contentDetails": {
+       "videoId": "2mgKDqD5Ga8",
+       "videoPublishedAt": "2018-08-30T20:45:28.000Z"
+      }
+     },
+     {
+      "kind": "youtube#playlistItem",
+      "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/bNuwddJl7-QPdSLC9nrnyM8Sicc\"",
+      "id": "UExEV1o1dXpuNjlld3NNeXVHalZzQW5wUUlqeXVkMUN2OS4yODlGNEE0NkRGMEEzMEQy",
+      "snippet": {
+       "publishedAt": "2018-08-21T20:58:05.000Z",
+       "channelId": "UC9ZNrGdT2aAdrNbX78lbNlQ",
+       "title": "GopherCon UK 2018: Amy Chen - Code, Content, & Crafting Your Voice",
+       "description": "Hi, my name is Amy! By day, I’m a systems software engineer and work in the fabulous world of distributed systems. However, outside of writing code, I also care a lot about making YouTube videos on my channel Amy Codes! The channel enables me to carve out a space online and craft my voice into a personal brand. What inspired to make YouTube videos? What is entailed in crafting a distinctive personal brand? Why should software engineers care? How has building a personal brand been effective in empowering other people? I hope to provide you actionable advice to apply into your own career.",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/C5wkhwBhYzI/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/C5wkhwBhYzI/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/C5wkhwBhYzI/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/C5wkhwBhYzI/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/C5wkhwBhYzI/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "GopherCon UK",
+       "playlistId": "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9",
+       "position": 1,
+       "resourceId": {
+        "kind": "youtube#video",
+        "videoId": "C5wkhwBhYzI"
+       }
+      },
+      "contentDetails": {
+       "videoId": "C5wkhwBhYzI",
+       "videoPublishedAt": "2018-08-30T20:45:28.000Z"
+      }
+     },
+     {
+      "kind": "youtube#playlistItem",
+      "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/-cmpx97TsRry76iR2IG4wbJhtzY\"",
+      "id": "UExEV1o1dXpuNjlld3NNeXVHalZzQW5wUUlqeXVkMUN2OS4wMTcyMDhGQUE4NTIzM0Y5",
+      "snippet": {
+       "publishedAt": "2018-08-21T21:14:04.000Z",
+       "channelId": "UC9ZNrGdT2aAdrNbX78lbNlQ",
+       "title": "GopherCon UK 2018: Bernd Rucker - Orchestration of Microservices",
+       "description": "Microservices, DDD, distributed systems, serverless. All trends decompose to the max, which moves the complexity to the collaboration of these pieces. I want to tell some war stories around that in this talk and give people some guidance.",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/NBo7d5AG-3s/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/NBo7d5AG-3s/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/NBo7d5AG-3s/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/NBo7d5AG-3s/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/NBo7d5AG-3s/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "GopherCon UK",
+       "playlistId": "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9",
+       "position": 2,
+       "resourceId": {
+        "kind": "youtube#video",
+        "videoId": "NBo7d5AG-3s"
+       }
+      },
+      "contentDetails": {
+       "videoId": "NBo7d5AG-3s",
+       "videoPublishedAt": "2018-08-30T20:45:27.000Z"
+      }
+     },
+     {
+      "kind": "youtube#playlistItem",
+      "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/U__9v_6vj8Mp4qw1622Vr0J3NBo\"",
+      "id": "UExEV1o1dXpuNjlld3NNeXVHalZzQW5wUUlqeXVkMUN2OS41MjE1MkI0OTQ2QzJGNzNG",
+      "snippet": {
+       "publishedAt": "2018-08-21T21:18:20.000Z",
+       "channelId": "UC9ZNrGdT2aAdrNbX78lbNlQ",
+       "title": "GopherCon UK 2018: Christopher Biscardi - Going GraphQL",
+       "description": "REST is the current leader in client-server interactions. Our services have better tooling like grpc and better formats like protocol buffers and avro. Being well typed, GraphQL can bring these together to become the next step in client/server interaction.",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/FdURVezcdcw/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/FdURVezcdcw/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/FdURVezcdcw/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/FdURVezcdcw/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/FdURVezcdcw/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "GopherCon UK",
+       "playlistId": "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9",
+       "position": 3,
+       "resourceId": {
+        "kind": "youtube#video",
+        "videoId": "FdURVezcdcw"
+       }
+      },
+      "contentDetails": {
+       "videoId": "FdURVezcdcw",
+       "videoPublishedAt": "2018-08-30T20:45:27.000Z"
+      }
+     },
+     {
+      "kind": "youtube#playlistItem",
+      "etag": "\"XI7nbFXulYBIpL0ayR_gDh3eu1k/ORHsb7Im7tJb9PLlHj4tnebMtSo\"",
+      "id": "UExEV1o1dXpuNjlld3NNeXVHalZzQW5wUUlqeXVkMUN2OS4wOTA3OTZBNzVEMTUzOTMy",
+      "snippet": {
+       "publishedAt": "2018-08-22T21:07:43.000Z",
+       "channelId": "UC9ZNrGdT2aAdrNbX78lbNlQ",
+       "title": "GopherCon UK 2018: Grant Griffiths - Black Box Monitoring in Go",
+       "description": "You've set up your favorite monitoring agent on all of your services and you have incredible visibility into the internals of your infrastructure. All seems good in the world, but can your end user actually use your service? In this talk we'll write a simple app that simulates end user activity.",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/MAopsd6kdY0/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/MAopsd6kdY0/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/MAopsd6kdY0/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/MAopsd6kdY0/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/MAopsd6kdY0/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "GopherCon UK",
+       "playlistId": "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9",
+       "position": 4,
+       "resourceId": {
+        "kind": "youtube#video",
+        "videoId": "MAopsd6kdY0"
+       }
+      },
+      "contentDetails": {
+       "videoId": "MAopsd6kdY0",
+       "videoPublishedAt": "2018-08-30T20:45:27.000Z"
+      }
+     }
+    ]
+   }   

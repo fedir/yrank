@@ -47,16 +47,15 @@ func statusProcessing(statusCode int, url string) {
 }
 
 // ReadResp :  reads response from HTTP query.
-func readResp(fullResp []byte) ([]byte, string, error) {
+func readResp(fullResp []byte) ([]byte, error) {
 	r := bufio.NewReader(bytes.NewReader(fullResp))
 	resp, err := http.ReadResponse(r, nil)
 	if err != nil {
-		log.Printf("%v\n%s", err, fullResp)
+		log.Printf("Error reading response: %v\n%s", err, fullResp)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("%v\n%s", err, resp.Body)
+		log.Printf("Error reading response body: %v\n%s", err, resp.Body)
 	}
-	linkHeader := resp.Header.Get("Link")
-	return body, linkHeader, err
+	return body, err
 }

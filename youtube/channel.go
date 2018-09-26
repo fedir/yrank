@@ -12,12 +12,12 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 
 	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
 
-	resp, _, err := HttpRequest(url)
+	resp, _, err := httpRequest(url)
 	if err != nil {
 		panic(err)
 	}
 
-	jsonResponse, _, _ := readResp(resp)
+	jsonResponse, _ := readResp(resp)
 	channel := Channel{}
 	json.Unmarshal(jsonResponse, &channel)
 

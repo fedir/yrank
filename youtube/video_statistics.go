@@ -25,7 +25,7 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 	if err != nil {
 		panic(err)
 	}
-	jsonResponse, _, err := readResp(resp)
+	jsonResponse, err := readResp(resp)
 	if err != nil {
 		log.Println(err)
 	}
