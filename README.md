@@ -1,5 +1,7 @@
 # yrank = Youtube Rank
 
+[![Build Status](https://travis-ci.org/fedir/yrank.svg?branch=master)](https://travis-ci.org/fedir/yrank)
+
 Package which helps You to priorize a Youtube's playlist items for watching.
 
 It could be quite helpful, when You would like to choose the most interesting videos of an IT conference.
