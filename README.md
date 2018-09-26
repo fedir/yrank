@@ -29,6 +29,8 @@ After that, please copy ```config.example.toml``` to ```config.toml``` in the ap
         Sorting (default "likes", could be "positive-interest", "total-reaction")
     -o string
             Output format (default "table", could be "markdown")
+    -m int
+        The maximum number of items that should be returned
     -d bool
             Debug mode for more details during API exchange
 
