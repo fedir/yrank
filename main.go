@@ -8,9 +8,6 @@ import (
 
 func main() {
 
-	//TODO: maxResult this is temporary value that should be moved to the config file or as a param of cli
-	maxResult := "50"
-
 	// Getting configuration from configuration files and from CLI parameters
 	c := configuration()
 	cid, pid, of, s, m, d := cliParameters()
@@ -24,16 +21,18 @@ func main() {
 		if d {
 			fmt.Printf("Channel ID: %s\n", cid)
 		}
-		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, maxResult, d)
+		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, d)
 	} else if pid != "" {
 		if d {
 			fmt.Printf("Playlist ID: %s\n", pid)
 		}
-		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", maxResult, d)
+		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
 	}
 
 	// Sorting
 	youtube.SortBy(rankedVideos, s)
+
+	// Limiting number of results
 	if m > 0 && m <= len(rankedVideos) {
 		rankedVideos = rankedVideos[:m]
 	}

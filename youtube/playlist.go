@@ -7,8 +7,8 @@ import (
 )
 
 // PlaylistStatistics returns videos statistics of a Youtube playlist
-func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, maxResults string, debug bool) []VideoStatistics {
-	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&maxResults=" + maxResults + "&part=snippet%2CcontentDetails&key=" + apiKey
+func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, debug bool) []VideoStatistics {
+	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&part=snippet%2CcontentDetails&key=" + apiKey
 	if pageToken != "" {
 		url = url + "&pageToken=" + pageToken
 	}
@@ -41,7 +41,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, max
 	wg.Wait()
 
 	if playlist.NextPageToken != "" {
-		nextPagePlaylistStatistics := PlaylistStatistics(playlistKey, apiKey, playlist.NextPageToken, maxResults, debug)
+		nextPagePlaylistStatistics := PlaylistStatistics(playlistKey, apiKey, playlist.NextPageToken, debug)
 		playlistStatistic = append(playlistStatistic, nextPagePlaylistStatistics...)
 	}
 
