@@ -1,5 +1,7 @@
 package youtube
 
+import "time"
+
 // Channel datastructure for JSON unmarshalling
 type Channel struct {
 	NextPageToken string `json:"nextPageToken"`
@@ -23,7 +25,8 @@ type Playlist struct {
 			Description string `json:"Description"`
 		}
 		ContentDetails struct {
-			VideoID string `json:"videoId"`
+			VideoID          string `json:"videoId"`
+			VideoPublishedAt string `json:"videoPublishedAt"`
 		} `json:"contentDetails"`
 	} `json:"items"`
 }
@@ -43,14 +46,15 @@ type Video struct {
 
 // VideoStatistics statistics of a singular playlist
 type VideoStatistics struct {
-	Key                     string  `header:"Key"`
-	Title                   string  `header:"Title"`
-	URL                     string  `header:"URL"`
-	ViewCount               int     `header:"View count"`
-	LikeCount               int     `header:"Like count"`
-	DislikeCount            int     `header:"Dislike count"`
-	CommentCount            int     `header:"Comment count"`
-	PositiveInterestingness float64 `header:"Positive interestingness"`
-	GlobalBuzz              int     `header:"Global buzz"`
-	TotalReaction           float64 `header:"Total reaction"`
+	Key                     string    `header:"Key"`
+	Title                   string    `header:"Title"`
+	URL                     string    `header:"URL"`
+	PublishedAt             time.Time `header:"Published at"`
+	ViewCount               int       `header:"View count"`
+	LikeCount               int       `header:"Like count"`
+	DislikeCount            int       `header:"Dislike count"`
+	CommentCount            int       `header:"Comment count"`
+	PositiveInterestingness float64   `header:"Positive interestingness"`
+	GlobalBuzz              int       `header:"Global buzz"`
+	TotalReaction           float64   `header:"Total reaction"`
 }

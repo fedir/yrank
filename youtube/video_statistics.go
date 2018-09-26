@@ -6,9 +6,10 @@ import (
 	"log"
 	"strconv"
 	"sync"
+	"time"
 )
 
-func videoStatistics(vid string, title string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup, debug bool) {
+func videoStatistics(vid string, title string, publishedAt string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup, debug bool) {
 
 	defer wg.Done()
 
@@ -34,6 +35,10 @@ func videoStatistics(vid string, title string, apiKey string, dataChan chan Vide
 	for _, item := range video.Items {
 		vs.Key = item.ID
 		vs.URL = "https://www.youtube.com/watch?v=" + item.ID
+		vs.PublishedAt, err = time.Parse(time.RFC3339, publishedAt)
+		if err != nil {
+			panic(err)
+		}
 		vs.ViewCount, _ = strconv.Atoi(item.Statistics.ViewCount)
 		vs.LikeCount, _ = strconv.Atoi(item.Statistics.LikeCount)
 		vs.DislikeCount, _ = strconv.Atoi(item.Statistics.DislikeCount)

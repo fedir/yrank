@@ -30,7 +30,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 
 	dataChan := make(chan VideoStatistics, len(playlist.Items))
 	for _, video := range playlist.Items {
-		go videoStatistics(video.ContentDetails.VideoID, video.Snippet.Title, apiKey, dataChan, &wg, debug)
+		go videoStatistics(video.ContentDetails.VideoID, video.Snippet.Title, video.ContentDetails.VideoPublishedAt, apiKey, dataChan, &wg, debug)
 	}
 	for range playlist.Items {
 		vs := <-dataChan

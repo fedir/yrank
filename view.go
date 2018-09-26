@@ -28,6 +28,7 @@ func print(vs []youtube.VideoStatistics, of string) {
 	table.SetHeader([]string{
 		"Title",
 		"URL",
+		"Published at",
 		"Likes",
 		"Positive interestingness",
 		"Total reaction",
@@ -43,6 +44,7 @@ func print(vs []youtube.VideoStatistics, of string) {
 				[]string{
 					vsi.Title,
 					vsi.URL,
+					fmt.Sprintf(vsi.PublishedAt.Format("2006-01-02 15:04:05")),
 					strconv.Itoa(vsi.LikeCount),
 					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
 					fmt.Sprintf("%.4f", vsi.TotalReaction),
