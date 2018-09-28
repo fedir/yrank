@@ -1,19 +1,10 @@
 package youtube
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
-
-func loadRespFromFile(file string) []byte {
-	resp, err := ioutil.ReadFile(file)
-	if err != nil {
-		panic(err)
-	}
-	return resp
-}
 
 func Test_playlist(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

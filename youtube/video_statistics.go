@@ -21,20 +21,12 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		fmt.Printf("Video URL: %s\n", url)
 	}
 
-	resp, _, err := httpRequest(url)
-	if err != nil {
-		panic(err)
-	}
-	jsonResponse, err := readResp(resp)
-	if err != nil {
-		log.Println(err)
-	}
-	video := Video{}
-	json.Unmarshal(jsonResponse, &video)
+	video := video(url)
 
 	for _, item := range video.Items {
 		vs.Key = item.ID
 		vs.URL = "https://www.youtube.com/watch?v=" + item.ID
+		var err error
 		vs.PublishedAt, err = time.Parse(time.RFC3339, publishedAt)
 		if err != nil {
 			panic(err)
@@ -50,4 +42,18 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 	}
 
 	dataChan <- *vs
+}
+
+func video(url string) Video {
+	resp, _, err := httpRequest(url)
+	if err != nil {
+		panic(err)
+	}
+	jsonResponse, err := readResp(resp)
+	if err != nil {
+		log.Println(err)
+	}
+	video := Video{}
+	json.Unmarshal(jsonResponse, &video)
+	return video
 }
