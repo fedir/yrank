@@ -12,15 +12,11 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 
 	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
 
-	resp, _, err := httpRequest(url)
-	if err != nil {
-		panic(err)
+	if debug {
+		fmt.Printf("Channel URL: %s\n", url)
 	}
 
-	jsonResponse, _ := readResp(resp)
-	channel := Channel{}
-	json.Unmarshal(jsonResponse, &channel)
-
+	channel := channel(url)
 	for _, pl := range channel.Items {
 		if debug {
 			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
@@ -41,4 +37,15 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 	}
 
 	return uniqueVideos
+}
+
+func channel(url string) Channel {
+	resp, _, err := httpRequest(url)
+	if err != nil {
+		panic(err)
+	}
+	jsonResponse, _ := readResp(resp)
+	channel := Channel{}
+	json.Unmarshal(jsonResponse, &channel)
+	return channel
 }
