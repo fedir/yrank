@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/fedir/yrank.svg?branch=master)](https://travis-ci.org/fedir/yrank)
 [![codecov](https://codecov.io/gh/fedir/yrank/branch/master/graph/badge.svg)](https://codecov.io/gh/fedir/yrank)
 
-Package which helps You to priorize a Youtube's playlist items for watching.
+Package which helps You to priorize a Youtube channel or playlist items for watching.
 
 It could be quite helpful, when You would like to choose the most interesting videos of an IT conference.
 
