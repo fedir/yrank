@@ -17,9 +17,18 @@ To install the package :
 
 ## Usage
 
+### Youtube Data API
+
 IMPORTANT: You should have a Youtube API key to use the application. You could crуate it at [Google Developers Console](https://console.developers.google.com/).
 
-After that, please copy ```config.example.toml``` to ```config.toml``` in the application folder and define Your Youtube API key there.
+Follow next steps to use build `yrank` locally and to build and use :
+
+* Create a new project
+* Enable YouTube Data API v3
+* Create API key for this API
+* Copy ```config.example.toml``` to ```config.toml``` in the application folder and define Your YouTube Data API v3 key there.
+* Build the project with `go build`
+* Run a sample `./yrank -p PL_QKjHDgmNzp7DA4KIR4qC-bjIVDlYdkk -s positive-interest -o table -m 10`
 
 ### CLI options
 
@@ -61,6 +70,7 @@ First of all, You must find the channel ID of the user. It's not always that eas
 
 ### Results samples
 
+* Ranking of FOSDEM 2020 videos 
 * Ranking of GopherCon 2018 videos https://gist.github.com/fedir/98f6a2ed65e7462a101198dc6f3d5185
 * Ranking of GopherCon UK 2018 videos https://gist.github.com/fedir/6a93e91fa414df6484ba04589ed3269a
 * Ranking of Gopher Academy channel videos https://gist.github.com/fedir/c900d0fb59658f9657253f33e38422fe
