@@ -32,8 +32,8 @@ func cliParameters() (string, string, string, string, int, bool) {
 	var (
 		playlistID = flag.String("p", "", "Youtube playlist ID")
 		channelID  = flag.String("c", "", "Youtube channel ID")
-		output     = flag.String("o", "table", "Output format")
-		sorting    = flag.String("s", "likes", "Sorting")
+		output     = flag.String("o", "table", "Output format {table|markdown}")
+		sorting    = flag.String("s", "total-interest", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction}")
 		maxResults = flag.Int("m", 0, "The maximum number of items that should be returned")
 		debug      = flag.Bool("d", false, "Debug mode")
 	)
