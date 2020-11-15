@@ -7,9 +7,9 @@ Package which helps You to priorize a Youtube channel or playlist items for watc
 
 It could be quite helpful, when You would like to choose the most interesting videos of an IT conference.
 
-## Installation
+## Local installation
 
-golang 1.10+ should be installed. Go environment [is very simple to install](https://golang.org/doc/install).
+Go 1.14+ should be installed. Go environment [is very simple to install](https://golang.org/doc/install).
 
 To install the package :
 
