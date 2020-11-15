@@ -70,7 +70,7 @@ First of all, You must find the channel ID of the user. It's not always that eas
 
 ### Results samples
 
-* Ranking of FOSDEM 2020 videos 
+* Ranking of FOSDEM 2020 videos https://github.com/fedir/yrank/blob/master/sample_output/fosdem2020_positive_interest.md
 * Ranking of GopherCon 2018 videos https://gist.github.com/fedir/98f6a2ed65e7462a101198dc6f3d5185
 * Ranking of GopherCon UK 2018 videos https://gist.github.com/fedir/6a93e91fa414df6484ba04589ed3269a
 * Ranking of Gopher Academy channel videos https://gist.github.com/fedir/c900d0fb59658f9657253f33e38422fe
