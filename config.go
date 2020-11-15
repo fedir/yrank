@@ -46,7 +46,7 @@ func cliParameters() (string, string, string, string, int, bool) {
 	if *output != "table" && *output != "markdown" {
 		log.Fatalln("Output format unknown")
 	}
-	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" {
+	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" && *sorting != "global-buzz-index" && *sorting != "total-reaction" {
 		log.Fatalln("Unknown sorting column")
 	}
 

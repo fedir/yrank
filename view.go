@@ -29,13 +29,14 @@ func print(vs []youtube.VideoStatistics, of string) {
 		"Title",
 		"URL",
 		"Published at",
-		"Likes",
 		"Positive interestingness",
-		"Total reaction",
-		"Global buzz",
+		"Total interestingness",
 		"Views",
+		"Likes",
 		"Dislikes",
 		"Comments",
+		"Total reaction",
+		"Global buzz index",
 	})
 
 	for _, vsi := range vs {
@@ -45,13 +46,14 @@ func print(vs []youtube.VideoStatistics, of string) {
 					vsi.Title,
 					vsi.URL,
 					fmt.Sprintf(vsi.PublishedAt.Format("2006-01-02 15:04:05")),
-					strconv.Itoa(vsi.LikeCount),
 					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
-					fmt.Sprintf("%.4f", vsi.TotalReaction),
-					strconv.Itoa(vsi.GlobalBuzz),
+					fmt.Sprintf("%.4f", vsi.TotalInterestingness),
 					strconv.Itoa(vsi.ViewCount),
+					strconv.Itoa(vsi.LikeCount),
 					strconv.Itoa(vsi.DislikeCount),
 					strconv.Itoa(vsi.CommentCount),
+					strconv.Itoa(vsi.TotalReaction),
+					strconv.Itoa(vsi.GlobalBuzzIndex),
 				},
 			)
 		}

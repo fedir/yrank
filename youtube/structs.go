@@ -55,6 +55,7 @@ type VideoStatistics struct {
 	DislikeCount            int       `header:"Dislike count"`
 	CommentCount            int       `header:"Comment count"`
 	PositiveInterestingness float64   `header:"Positive interestingness"`
-	GlobalBuzz              int       `header:"Global buzz"`
-	TotalReaction           float64   `header:"Total reaction"`
+	GlobalBuzzIndex         int       `header:"Global buzz index"`
+	TotalReaction           int       `header:"Total reaction"`
+	TotalInterestingness    float64   `header:"Total reaction"`
 }
