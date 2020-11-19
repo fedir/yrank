@@ -38,7 +38,7 @@ Follow next steps to use build `yrank` locally and to build and use :
     -c string
             Youtube channel ID
     -s string
-        Sorting (default "likes", could be "positive-interest", "total-interest", "total-reaction", "global-buzz-index")
+        Sorting (default "likes", could be "positive-interest", "total-interest", "total-reaction", "global-buzz-index", "positive-negative-coefficient" or "pnc")
     -o string
             Output format (default "table", could be "markdown")
     -m int

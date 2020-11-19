@@ -33,7 +33,7 @@ func cliParameters() (string, string, string, string, int, bool) {
 		playlistID = flag.String("p", "", "Youtube playlist ID")
 		channelID  = flag.String("c", "", "Youtube channel ID")
 		output     = flag.String("o", "table", "Output format {table|markdown}")
-		sorting    = flag.String("s", "total-interest", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction}")
+		sorting    = flag.String("s", "total-interest", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc}")
 		maxResults = flag.Int("m", 0, "The maximum number of items that should be returned")
 		debug      = flag.Bool("d", false, "Debug mode")
 	)
@@ -46,7 +46,7 @@ func cliParameters() (string, string, string, string, int, bool) {
 	if *output != "table" && *output != "markdown" {
 		log.Fatalln("Output format unknown")
 	}
-	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" && *sorting != "global-buzz-index" && *sorting != "total-reaction" {
+	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" && *sorting != "global-buzz-index" && *sorting != "total-reaction" && *sorting != "pnc" && *sorting != "positive-negative-coefficient" {
 		log.Fatalln("Unknown sorting column")
 	}
 

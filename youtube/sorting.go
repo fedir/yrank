@@ -13,6 +13,12 @@ func SortBy(vs []VideoStatistics, sortingColumn string) {
 		sort.Slice(vs[:], func(i, j int) bool {
 			return vs[i].PositiveInterestingness > vs[j].PositiveInterestingness
 		})
+	case "pnc":
+		fallthrough
+	case "positive-negative-coefficient":
+		sort.Slice(vs[:], func(i, j int) bool {
+			return vs[i].PositiveNegativeCoefficient > vs[j].PositiveNegativeCoefficient
+		})
 	case "global-buzz-index":
 		sort.Slice(vs[:], func(i, j int) bool {
 			return vs[i].GlobalBuzzIndex > vs[j].GlobalBuzzIndex
@@ -22,6 +28,7 @@ func SortBy(vs []VideoStatistics, sortingColumn string) {
 			return vs[i].LikeCount > vs[j].LikeCount
 		})
 	case "total-interest":
+		fallthrough
 	default:
 		sort.Slice(vs[:], func(i, j int) bool {
 			return vs[i].TotalInterestingness > vs[j].TotalInterestingness

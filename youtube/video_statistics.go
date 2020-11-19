@@ -38,6 +38,7 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		vs.TotalReaction = vs.LikeCount + vs.DislikeCount + vs.CommentCount
 		vs.Title = title
 		vs.PositiveInterestingness = float64(vs.LikeCount-vs.DislikeCount) / float64(vs.ViewCount)
+		vs.PositiveNegativeCoefficient = float64(vs.LikeCount) / float64(1+vs.DislikeCount)
 		vs.TotalInterestingness = float64(vs.LikeCount+vs.DislikeCount+vs.CommentCount) / float64(vs.ViewCount)
 		vs.GlobalBuzzIndex = vs.ViewCount * (vs.LikeCount + vs.DislikeCount + vs.CommentCount)
 	}

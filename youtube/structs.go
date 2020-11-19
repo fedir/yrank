@@ -46,16 +46,17 @@ type Video struct {
 
 // VideoStatistics statistics of a singular playlist
 type VideoStatistics struct {
-	Key                     string    `header:"Key"`
-	Title                   string    `header:"Title"`
-	URL                     string    `header:"URL"`
-	PublishedAt             time.Time `header:"Published at"`
-	ViewCount               int       `header:"View count"`
-	LikeCount               int       `header:"Like count"`
-	DislikeCount            int       `header:"Dislike count"`
-	CommentCount            int       `header:"Comment count"`
-	PositiveInterestingness float64   `header:"Positive interestingness"`
-	GlobalBuzzIndex         int       `header:"Global buzz index"`
-	TotalReaction           int       `header:"Total reaction"`
-	TotalInterestingness    float64   `header:"Total reaction"`
+	Key                         string    `header:"Key"`
+	Title                       string    `header:"Title"`
+	URL                         string    `header:"URL"`
+	PublishedAt                 time.Time `header:"Published at"`
+	ViewCount                   int       `header:"View count"`
+	LikeCount                   int       `header:"Like count"`
+	DislikeCount                int       `header:"Dislike count"`
+	CommentCount                int       `header:"Comment count"`
+	PositiveInterestingness     float64   `header:"Positive interestingness"`
+	PositiveNegativeCoefficient float64   `header:"Positive/hegative coefficient"`
+	GlobalBuzzIndex             int       `header:"Global buzz index"`
+	TotalReaction               int       `header:"Total reaction"`
+	TotalInterestingness        float64   `header:"Total reaction"`
 }
