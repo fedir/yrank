@@ -44,11 +44,18 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		DislikeCount:                dislikes,
 		CommentCount:                comments,
 		TotalReaction:               likes + dislikes + comments,
-		PositiveInterestingness:     float64(likes-dislikes) / float64(views),
+		PositiveInterestingness:     safeDiv(float64(likes-dislikes), float64(views)),
 		PositiveNegativeCoefficient: float64(likes) / float64(1+dislikes),
-		TotalInterestingness:        float64(likes+dislikes+comments) / float64(views),
+		TotalInterestingness:        safeDiv(float64(likes+dislikes+comments), float64(views)),
 		GlobalBuzzIndex:             views * (likes + dislikes + comments),
 	}
+}
+
+func safeDiv(a, b float64) float64 {
+	if b == 0 {
+		return 0
+	}
+	return a / b
 }
 
 func fetchVideo(url string) Video {

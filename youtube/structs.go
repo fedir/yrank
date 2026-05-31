@@ -29,7 +29,7 @@ type Playlist struct {
 	Items []struct {
 		Snippet struct {
 			Title       string `json:"title"`
-			Description string `json:"Description"`
+			Description string `json:"description"`
 		}
 		ContentDetails struct {
 			VideoID          string `json:"videoId"`
@@ -63,8 +63,8 @@ type VideoStatistics struct {
 	DislikeCount                int       `header:"Dislike count"`
 	CommentCount                int       `header:"Comment count"`
 	PositiveInterestingness     float64   `header:"Positive interestingness"`
-	PositiveNegativeCoefficient float64   `header:"Positive/hegative coefficient"`
+	PositiveNegativeCoefficient float64   `header:"Positive/negative coefficient"`
 	GlobalBuzzIndex             int       `header:"Global buzz index"`
 	TotalReaction               int       `header:"Total reaction"`
-	TotalInterestingness        float64   `header:"Total reaction"`
+	TotalInterestingness        float64   `header:"Total interestingness"`
 }
