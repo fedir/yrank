@@ -6,20 +6,16 @@ import (
 	"testing"
 )
 
-func Test_channel(t *testing.T) {
+func Test_fetchChannel(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		f := loadRespFromFile("./responses/channel.json")
-		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(f)
+		w.WriteHeader(http.StatusOK)
+		w.Write(loadRespFromFile("./responses/channel.json"))
 	}))
 	defer ts.Close()
 
-	testURL := ts.URL
-	t.Logf("%s\n", testURL)
-	channel := channel(testURL)
-	if channel.Items[0].PlaylistID != "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9" {
-		t.Errorf("Wrong first item title")
+	ch := fetchChannel(ts.URL)
+	if ch.Items[0].PlaylistID != "PLDWZ5uzn69ewsMyuGjVsAnpQIjyud1Cv9" {
+		t.Errorf("unexpected first playlist ID: %s", ch.Items[0].PlaylistID)
 	}
-
 }

@@ -4,18 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
-	"strings"
 	"testing"
 )
-
-func bytesToString(b []byte) string {
-	s := make([]string, len(b))
-	for i := range b {
-		s[i] = strconv.Itoa(int(b[i]))
-	}
-	return strings.Join(s, ",")
-}
 
 func TestOKStatus(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,9 +13,7 @@ func TestOKStatus(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	testURL := ts.URL
-	t.Logf("%s\n", testURL)
-	_, _, err := httpRequest(testURL)
+	_, _, err := httpRequest(ts.URL)
 	if err != nil {
 		t.Errorf("httpRequest() returned an error: %s", err)
 	}
@@ -33,25 +21,21 @@ func TestOKStatus(t *testing.T) {
 
 func Test_readJSON(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		f := loadRespFromFile("./responses/playlistItems.json")
-		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(f)
+		w.WriteHeader(http.StatusOK)
+		w.Write(loadRespFromFile("./responses/playlistItems.json"))
 	}))
 	defer ts.Close()
-	testURL := ts.URL
-	t.Logf("%s\n", testURL)
-	resp, _, err := httpRequest(testURL)
+
+	body, _, err := httpRequest(ts.URL)
 	if err != nil {
-		panic(err)
+		t.Fatalf("httpRequest() error: %v", err)
 	}
-	jsonResponse, err := readResp(resp)
-	if err != nil {
-		panic(err)
+	var pl Playlist
+	if err := json.Unmarshal(body, &pl); err != nil {
+		t.Fatalf("json.Unmarshal error: %v", err)
 	}
-	playlist := Playlist{}
-	json.Unmarshal(jsonResponse, &playlist)
-	if len(playlist.Items) != 5 {
-		t.Errorf("Wrong number of playlists found")
+	if len(pl.Items) != 5 {
+		t.Errorf("expected 5 items, got %d", len(pl.Items))
 	}
 }
