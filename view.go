@@ -9,8 +9,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func print(vs []youtube.VideoStatistics, of string) {
-
+func print(vs []youtube.VideoStatistics, of string, showScore bool) {
 	table := tablewriter.NewWriter(os.Stdout)
 
 	if of == "table" {
@@ -25,7 +24,7 @@ func print(vs []youtube.VideoStatistics, of string) {
 		table.SetAutoWrapText(false)
 	}
 
-	table.SetHeader([]string{
+	headers := []string{
 		"Title",
 		"URL",
 		"Published at",
@@ -38,27 +37,34 @@ func print(vs []youtube.VideoStatistics, of string) {
 		"Comments",
 		"Total reaction",
 		"Global buzz index",
-	})
+	}
+	if showScore {
+		headers = append([]string{"Score"}, headers...)
+	}
+	table.SetHeader(headers)
 
 	for _, vsi := range vs {
-		if vsi.Title != "" {
-			table.Append(
-				[]string{
-					vsi.Title,
-					vsi.URL,
-					vsi.PublishedAt.Format("2006-01-02 15:04:05"),
-					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
-					fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
-					fmt.Sprintf("%.4f", vsi.TotalInterestingness),
-					strconv.Itoa(vsi.ViewCount),
-					strconv.Itoa(vsi.LikeCount),
-					strconv.Itoa(vsi.DislikeCount),
-					strconv.Itoa(vsi.CommentCount),
-					strconv.Itoa(vsi.TotalReaction),
-					strconv.Itoa(vsi.GlobalBuzzIndex),
-				},
-			)
+		if vsi.Title == "" {
+			continue
 		}
+		row := []string{
+			vsi.Title,
+			vsi.URL,
+			vsi.PublishedAt.Format("2006-01-02 15:04:05"),
+			fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
+			fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
+			fmt.Sprintf("%.4f", vsi.TotalInterestingness),
+			strconv.Itoa(vsi.ViewCount),
+			strconv.Itoa(vsi.LikeCount),
+			strconv.Itoa(vsi.DislikeCount),
+			strconv.Itoa(vsi.CommentCount),
+			strconv.Itoa(vsi.TotalReaction),
+			strconv.Itoa(vsi.GlobalBuzzIndex),
+		}
+		if showScore {
+			row = append([]string{fmt.Sprintf("%.6f", vsi.Score)}, row...)
+		}
+		table.Append(row)
 	}
-	table.Render() // Send output
+	table.Render()
 }

@@ -2,10 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/fedir/yrank/youtube"
 	"github.com/joho/godotenv"
 )
 
@@ -18,32 +22,109 @@ func configuration() Configuration {
 	return Configuration{apikey: apikey}
 }
 
-func cliParameters() (string, string, string, string, int, string, bool) {
+// envWeights reads WEIGHT_<STRATEGY>_<KEY> variables from the environment
+// and returns them as a flat map keyed by "<strategy>_<key>" (lowercase).
+func envWeights() youtube.Weights {
+	weights := youtube.Weights{}
+	for _, e := range os.Environ() {
+		parts := strings.SplitN(e, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key, val := parts[0], parts[1]
+		if !strings.HasPrefix(strings.ToUpper(key), "WEIGHT_") {
+			continue
+		}
+		suffix := strings.ToLower(strings.TrimPrefix(strings.ToUpper(key), "WEIGHT_"))
+		f, err := strconv.ParseFloat(val, 64)
+		if err != nil {
+			log.Fatalf("invalid weight value for %s: %v", key, err)
+		}
+		weights[suffix] = f
+	}
+	return weights
+}
+
+// parseWeightsFlag parses "key=val,key=val" into a Weights map.
+func parseWeightsFlag(raw string) youtube.Weights {
+	w := youtube.Weights{}
+	if raw == "" {
+		return w
+	}
+	for _, pair := range strings.Split(raw, ",") {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) != 2 {
+			log.Fatalf("invalid -weights pair %q, expected key=value", pair)
+		}
+		f, err := strconv.ParseFloat(strings.TrimSpace(kv[1]), 64)
+		if err != nil {
+			log.Fatalf("invalid weight value %q: %v", kv[1], err)
+		}
+		w[strings.TrimSpace(kv[0])] = f
+	}
+	return w
+}
+
+func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw string, maxResults int, debug bool) {
 	var (
-		playlistID = flag.String("p", "", "Youtube playlist ID")
-		channelID  = flag.String("c", "", "Youtube channel ID")
-		output     = flag.String("o", "table", "Output format {table|markdown}")
-		sorting    = flag.String("s", "total-interest", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc}")
-		maxResults = flag.Int("m", 0, "The maximum number of items that should be returned")
-		from       = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
-		debug      = flag.Bool("d", false, "Debug mode")
+		playlistID  = flag.String("p", "", "Youtube playlist ID")
+		channelID   = flag.String("c", "", "Youtube channel ID")
+		out         = flag.String("o", "table", "Output format {table|markdown}")
+		sort        = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
+		strat       = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
+		maxRes      = flag.Int("m", 0, "Max items to return (0 = all)")
+		fromDate    = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
+		weightsFlag = flag.String("weights", "", "Override strategy weights: key=val,key=val")
+		dbg         = flag.Bool("d", false, "Debug mode")
 	)
 	flag.Parse()
+
 	if *playlistID == "" && *channelID == "" {
 		log.Fatalln("Playlist ID or channel ID must be defined")
-	} else if *playlistID != "" && *channelID != "" {
+	}
+	if *playlistID != "" && *channelID != "" {
 		log.Fatalln("Playlist ID & channel ID cannot be used together")
 	}
-	if *output != "table" && *output != "markdown" {
+	if *out != "table" && *out != "markdown" {
 		log.Fatalln("Unknown output format")
 	}
-	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" && *sorting != "global-buzz-index" && *sorting != "total-reaction" && *sorting != "pnc" && *sorting != "positive-negative-coefficient" {
-		log.Fatalln("Unknown sorting column")
+	if *sort != "" && *strat != "" {
+		log.Fatalln("-s and -strategy cannot be used together")
 	}
-	if *from != "" {
-		if _, err := time.Parse("2006-01-02", *from); err != nil {
+	if *sort != "" {
+		validSorts := map[string]bool{
+			"likes": true, "total-interest": true, "positive-interest": true,
+			"global-buzz-index": true, "total-reaction": true,
+			"positive-negative-coefficient": true, "pnc": true,
+		}
+		if !validSorts[*sort] {
+			log.Fatalln("Unknown sorting column")
+		}
+	}
+	if *strat != "" {
+		if _, ok := youtube.Strategies[*strat]; !ok {
+			log.Fatalf("Unknown strategy %q, available: %s", *strat, knownStrategies())
+		}
+	}
+	if *fromDate != "" {
+		if _, err := time.Parse("2006-01-02", *fromDate); err != nil {
 			log.Fatalln("Invalid -from date, expected format YYYY-MM-DD")
 		}
 	}
-	return *channelID, *playlistID, *output, *sorting, *maxResults, *from, *debug
+
+	// Default sort when neither -s nor -strategy is given
+	sortVal := *sort
+	if sortVal == "" && *strat == "" {
+		sortVal = "total-interest"
+	}
+
+	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *maxRes, *dbg
+}
+
+func knownStrategies() string {
+	names := make([]string, 0, len(youtube.Strategies))
+	for k := range youtube.Strategies {
+		names = append(names, k)
+	}
+	return strings.Join(names, "|")
 }

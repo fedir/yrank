@@ -10,7 +10,7 @@ import (
 
 func main() {
 	c := configuration()
-	cid, pid, of, s, m, from, d := cliParameters()
+	cid, pid, of, sorting, strategy, from, weightsRaw, m, d := cliParameters()
 	if d {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
@@ -36,12 +36,19 @@ func main() {
 		rankedVideos = filterFrom(rankedVideos, fromDate)
 	}
 
-	youtube.SortBy(rankedVideos, s)
+	if strategy != "" {
+		env := envWeights()
+		cli := parseWeightsFlag(weightsRaw)
+		weights := youtube.ResolveWeights(strategy, env, cli)
+		youtube.ApplyStrategy(rankedVideos, strategy, weights)
+	} else {
+		youtube.SortBy(rankedVideos, sorting)
+	}
 
 	if m > 0 && m <= len(rankedVideos) {
 		rankedVideos = rankedVideos[:m]
 	}
-	print(rankedVideos, of)
+	print(rankedVideos, of, strategy != "")
 }
 
 func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.VideoStatistics {
