@@ -3,58 +3,53 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"sync"
 )
 
-// PlaylistStatistics returns videos statistics of a Youtube playlist
+// PlaylistStatistics returns video statistics for every video in a playlist,
+// following pagination automatically.
 func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, debug bool) []VideoStatistics {
-
-	// Prepare URL
 	url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&maxResults=50&part=snippet%2CcontentDetails&key=" + apiKey
 	if pageToken != "" {
-		url = url + "&pageToken=" + pageToken
+		url += "&pageToken=" + pageToken
 	}
 	if debug {
 		fmt.Printf("Playlist URL: %s\n", url)
 	}
 
-	// Get playlist
-	playlist := playlist(url)
+	pl := fetchPlaylist(url)
 
-	// Get each video statistics
-	var playlistStatistic = []VideoStatistics{}
+	dataChan := make(chan VideoStatistics, len(pl.Items))
 	var wg sync.WaitGroup
-	wg.Add(len(playlist.Items))
-
-	dataChan := make(chan VideoStatistics, len(playlist.Items))
-	for _, video := range playlist.Items {
-		go videoStatistics(video.ContentDetails.VideoID, video.Snippet.Title, video.ContentDetails.VideoPublishedAt, apiKey, dataChan, &wg, debug)
-	}
-	for range playlist.Items {
-		vs := <-dataChan
-		if vs.Title != "" {
-			playlistStatistic = append(playlistStatistic, vs)
-		}
+	wg.Add(len(pl.Items))
+	for _, item := range pl.Items {
+		go videoStatistics(item.ContentDetails.VideoID, item.Snippet.Title, item.ContentDetails.VideoPublishedAt, apiKey, dataChan, &wg, debug)
 	}
 	wg.Wait()
+	close(dataChan)
 
-	// If more than 1 page of videos in playlist, append additional videos from next pages
-	if playlist.NextPageToken != "" {
-		nextPagePlaylistStatistics := PlaylistStatistics(playlistKey, apiKey, playlist.NextPageToken, debug)
-		playlistStatistic = append(playlistStatistic, nextPagePlaylistStatistics...)
+	var stats []VideoStatistics
+	for vs := range dataChan {
+		if vs.Title != "" {
+			stats = append(stats, vs)
+		}
 	}
 
-	return playlistStatistic
+	if pl.NextPageToken != "" {
+		stats = append(stats, PlaylistStatistics(playlistKey, apiKey, pl.NextPageToken, debug)...)
+	}
+	return stats
 }
 
-func playlist(url string) Playlist {
-	// Get playlist
-	resp, _, err := httpRequest(url)
+func fetchPlaylist(url string) Playlist {
+	body, _, err := httpRequest(url)
 	if err != nil {
-		panic(err)
+		log.Fatalf("playlist request failed: %v", err)
 	}
-	jsonResponse, _ := readResp(resp)
-	playlist := Playlist{}
-	json.Unmarshal(jsonResponse, &playlist)
-	return playlist
+	var pl Playlist
+	if err := json.Unmarshal(body, &pl); err != nil {
+		log.Fatalf("playlist JSON decode failed: %v", err)
+	}
+	return pl
 }

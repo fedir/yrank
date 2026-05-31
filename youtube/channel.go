@@ -3,49 +3,45 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
-// ChannelStatistics returns videos statistics of a Youtube channel
+// ChannelStatistics returns video statistics for all playlists in a channel.
 func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics {
-
-	var channelVideos = []VideoStatistics{}
-
 	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
-
 	if debug {
 		fmt.Printf("Channel URL: %s\n", url)
 	}
 
-	channel := channel(url)
-	for _, pl := range channel.Items {
+	ch := fetchChannel(url)
+	var all []VideoStatistics
+	for _, pl := range ch.Items {
 		if debug {
 			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
 		}
-		playlistVideos := PlaylistStatistics(pl.PlaylistID, apiKey, "", debug)
-		channelVideos = append(channelVideos, playlistVideos...)
+		all = append(all, PlaylistStatistics(pl.PlaylistID, apiKey, "", debug)...)
 	}
 
-	// Single video could be in multiple playlists, so we should make the array unique
-	// (the best will be to do it even before to collect the videos details, to avoid additional usage of API quota)
-	var uniqueVideos []VideoStatistics
-	uniqueVideosKeys := make(map[string]bool)
-	for _, video := range channelVideos {
-		if _, ok := uniqueVideosKeys[video.Key]; !ok {
-			uniqueVideosKeys[video.Key] = true
-			uniqueVideos = append(uniqueVideos, video)
+	// Deduplicate — a video can appear in multiple playlists.
+	seen := make(map[string]bool, len(all))
+	unique := make([]VideoStatistics, 0, len(all))
+	for _, v := range all {
+		if !seen[v.Key] {
+			seen[v.Key] = true
+			unique = append(unique, v)
 		}
 	}
-
-	return uniqueVideos
+	return unique
 }
 
-func channel(url string) Channel {
-	resp, _, err := httpRequest(url)
+func fetchChannel(url string) Channel {
+	body, _, err := httpRequest(url)
 	if err != nil {
-		panic(err)
+		log.Fatalf("channel request failed: %v", err)
 	}
-	jsonResponse, _ := readResp(resp)
-	channel := Channel{}
-	json.Unmarshal(jsonResponse, &channel)
-	return channel
+	var ch Channel
+	if err := json.Unmarshal(body, &ch); err != nil {
+		log.Fatalf("channel JSON decode failed: %v", err)
+	}
+	return ch
 }
