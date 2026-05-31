@@ -1,8 +1,38 @@
 package youtube
 
-import "sort"
+import (
+	"log"
+	"sort"
+	"time"
+)
 
-//SortBy sorts videos by some params
+// ApplyStrategy scores every video using the named strategy and resolved
+// weights, then sorts the slice descending by Score.
+func ApplyStrategy(vs []VideoStatistics, slug string, weights Weights) {
+	s, ok := Strategies[slug]
+	if !ok {
+		log.Fatalf("unknown strategy %q", slug)
+	}
+	maxViews := 0
+	for _, v := range vs {
+		if v.ViewCount > maxViews {
+			maxViews = v.ViewCount
+		}
+	}
+	ctx := StrategyContext{
+		MaxViews: maxViews,
+		Now:      time.Now(),
+		Weights:  weights,
+	}
+	for i := range vs {
+		vs[i].Score = s.Score(vs[i], ctx)
+	}
+	sort.Slice(vs, func(i, j int) bool {
+		return vs[i].Score > vs[j].Score
+	})
+}
+
+// SortBy sorts videos by some params
 func SortBy(vs []VideoStatistics, sortingColumn string) {
 	switch sortingColumn {
 	case "total-reaction":
