@@ -46,7 +46,7 @@ func print(vs []youtube.VideoStatistics, of string) {
 				[]string{
 					vsi.Title,
 					vsi.URL,
-					fmt.Sprintf(vsi.PublishedAt.Format("2006-01-02 15:04:05")),
+					vsi.PublishedAt.Format("2006-01-02 15:04:05"),
 					fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
 					fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
 					fmt.Sprintf("%.4f", vsi.TotalInterestingness),
