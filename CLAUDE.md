@@ -44,7 +44,7 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-m`, `-d` flags
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-m`, `-from`, `-strategy`, `-weights`, `-d` flags
 - `view.go`: `print()` renders results as table or markdown using `tablewriter`
 - `structs.go`: `Configuration` struct
 
