@@ -9,15 +9,12 @@ import (
 )
 
 func main() {
-
-	// Getting configuration from configuration files and from CLI parameters
 	c := configuration()
 	cid, pid, of, s, m, from, d := cliParameters()
 	if d {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
 
-	// Statistics retrieve from Youtube
 	var rankedVideos []youtube.VideoStatistics
 	if cid != "" {
 		if strings.HasPrefix(cid, "@") {
@@ -34,24 +31,25 @@ func main() {
 		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
 	}
 
-	// Filter by date
 	if from != "" {
 		fromDate, _ := time.Parse("2006-01-02", from)
-		filtered := rankedVideos[:0]
-		for _, v := range rankedVideos {
-			if !v.PublishedAt.Before(fromDate) {
-				filtered = append(filtered, v)
-			}
-		}
-		rankedVideos = filtered
+		rankedVideos = filterFrom(rankedVideos, fromDate)
 	}
 
-	// Sorting
 	youtube.SortBy(rankedVideos, s)
 
-	// Limiting number of results
 	if m > 0 && m <= len(rankedVideos) {
 		rankedVideos = rankedVideos[:m]
 	}
 	print(rankedVideos, of)
+}
+
+func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.VideoStatistics {
+	out := videos[:0]
+	for _, v := range videos {
+		if !v.PublishedAt.Before(from) {
+			out = append(out, v)
+		}
+	}
+	return out
 }
