@@ -6,15 +6,32 @@ import (
 	"log"
 )
 
-// ChannelStatistics returns video statistics for all playlists in a channel.
+// uploadsPlaylistID returns the auto-generated uploads playlist ID for a channel.
+// YouTube derives it by replacing the "UC" prefix with "UU".
+func uploadsPlaylistID(channelID string) string {
+	if len(channelID) >= 2 && channelID[:2] == "UC" {
+		return "UU" + channelID[2:]
+	}
+	return channelID
+}
+
+// ChannelStatistics returns video statistics for all videos in a channel,
+// including videos not assigned to any manual playlist (via the uploads playlist).
 func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics {
+	// Always start with the uploads playlist — it contains every uploaded video.
+	uploadsID := uploadsPlaylistID(cid)
+	if debug {
+		fmt.Printf("Uploads playlist: %s\n", uploadsID)
+	}
+	all := PlaylistStatistics(uploadsID, apiKey, "", debug)
+
+	// Also fetch manual playlists to pick up any videos that may differ
+	// (rare, but keeps behaviour consistent with prior versions).
 	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
 	if debug {
 		fmt.Printf("Channel URL: %s\n", url)
 	}
-
 	ch := fetchChannel(url)
-	var all []VideoStatistics
 	for _, pl := range ch.Items {
 		if debug {
 			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
