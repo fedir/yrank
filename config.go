@@ -2,32 +2,21 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
-// Getting configuration from configuration files and from CLI parameters
 func configuration() Configuration {
-	var c Configuration
-
-	v := viper.New()
-	v.SetConfigName("config")
-	v.SetConfigType("toml")
-	v.AddConfigPath(".")
-	if err := v.ReadInConfig(); err != nil {
-		fmt.Printf("couldn't load config: %s", err)
-		os.Exit(1)
+	godotenv.Load()
+	apikey := os.Getenv("YOUTUBE_API_KEY")
+	if apikey == "" {
+		log.Fatalln("YOUTUBE_API_KEY environment variable is not set")
 	}
-
-	c.apikey = v.GetString("apikey")
-
-	return c
+	return Configuration{apikey: apikey}
 }
 
-// Getting parameters from CLI
 func cliParameters() (string, string, string, string, int, bool) {
 	var (
 		playlistID = flag.String("p", "", "Youtube playlist ID")
@@ -41,14 +30,13 @@ func cliParameters() (string, string, string, string, int, bool) {
 	if *playlistID == "" && *channelID == "" {
 		log.Fatalln("Playlist ID or channel ID must be defined")
 	} else if *playlistID != "" && *channelID != "" {
-		log.Fatalln("Playlist ID & channel ID could not be used together")
+		log.Fatalln("Playlist ID & channel ID cannot be used together")
 	}
 	if *output != "table" && *output != "markdown" {
-		log.Fatalln("Output format unknown")
+		log.Fatalln("Unknown output format")
 	}
 	if *sorting != "likes" && *sorting != "total-interest" && *sorting != "positive-interest" && *sorting != "global-buzz-index" && *sorting != "total-reaction" && *sorting != "pnc" && *sorting != "positive-negative-coefficient" {
 		log.Fatalln("Unknown sorting column")
 	}
-
 	return *channelID, *playlistID, *output, *sorting, *maxResults, *debug
 }
