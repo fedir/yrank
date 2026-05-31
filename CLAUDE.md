@@ -68,3 +68,29 @@ Two-layer design:
 ## Sorting options
 
 `-s` flag values: `likes`, `total-interest` (default), `positive-interest`, `total-reaction`, `global-buzz-index`, `positive-negative-coefficient` (alias: `pnc`)
+
+`-s` and `-strategy` are mutually exclusive.
+
+## Evaluation strategies
+
+`-strategy` scores and sorts videos by a weighted formula. A `Score` column is prepended to the output.
+
+| Slug | Lens | Weight keys |
+|---|---|---|
+| `viral` | Algo/trending | `engagement`, `reach`, `comments` |
+| `educational` | Tutorial/reference | `likes`, `comments`, `recency` |
+| `controversial` | Debate/polarising | `ratio`, `volume` |
+| `community` | Fan engagement | `comments`, `sentiment` |
+| `evergreen` | Long-tail/SEO | `engagement`, `age` |
+| `hype` | Launch velocity | `velocity` |
+
+**Weight resolution order** (highest priority wins):
+1. Strategy defaults (in `youtube/strategy.go`)
+2. `.env` variables — `WEIGHT_<STRATEGY>_<KEY>=0.7` (e.g. `WEIGHT_VIRAL_ENGAGEMENT=0.7`)
+3. `-weights` CLI flag — `key=val,key=val` (e.g. `-weights engagement=0.9,reach=0.05,comments=0.05`)
+
+```bash
+./yrank -p PLAYLIST_ID -strategy viral
+./yrank -c @Squeezie -strategy evergreen -o markdown -m 10
+./yrank -p PLAYLIST_ID -strategy viral -weights engagement=0.9,reach=0.05,comments=0.05
+```

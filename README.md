@@ -3,74 +3,103 @@
 [![Build Status](https://travis-ci.org/fedir/yrank.svg?branch=master)](https://travis-ci.org/fedir/yrank)
 [![codecov](https://codecov.io/gh/fedir/yrank/branch/master/graph/badge.svg)](https://codecov.io/gh/fedir/yrank)
 
-Package which helps You to priorize a Youtube channel or playlist items for watching.
+Ranks videos in a YouTube playlist or channel by engagement metrics, so you can prioritise what to watch — especially useful for large conference playlists.
 
-It could be quite helpful, when You would like to choose the most interesting videos of an IT conference.
+## Installation
 
-## Local installation
+Go 1.26+ is required.
 
-Go 1.14+ should be installed. Go environment [is very simple to install](https://golang.org/doc/install).
+```bash
+go install github.com/fedir/yrank@latest
+```
 
-To install the package :
+Or build from source:
 
-    go get -u github.com/fedir/yrank
+```bash
+git clone https://github.com/fedir/yrank
+cd yrank
+make build
+```
 
-## Usage
+## Configuration
 
-### Youtube Data API
+You need a YouTube Data API v3 key from [Google Developers Console](https://console.developers.google.com/):
 
-IMPORTANT: You should have a Youtube API key to use the application. You could crуate it at [Google Developers Console](https://console.developers.google.com/).
+1. Create a project and enable **YouTube Data API v3**
+2. Generate an API key
+3. Copy `.env.example` to `.env` and set your key:
 
-Follow next steps to use build `yrank` locally and to build and use :
+```
+YOUTUBE_API_KEY=your_key_here
+```
 
-* Create a new project
-* Enable YouTube Data API v3
-* Create API key for this API
-* Copy ```config.example.toml``` to ```config.toml``` in the application folder and define Your YouTube Data API v3 key there.
-* Build the project with `go build`
-* Run a sample `./yrank -p PL_QKjHDgmNzp7DA4KIR4qC-bjIVDlYdkk -s positive-interest -o table -m 10`
+The key is also read directly from the environment if set there.
 
-### CLI options
+## CLI options
 
-    Usage of ./yrank:
-    -p string
-            Youtube playlist ID
-    -c string
-            Youtube channel ID
-    -s string
-        Sorting (default "likes", could be "positive-interest", "total-interest", "total-reaction", "global-buzz-index", "positive-negative-coefficient" or "pnc")
-    -o string
-            Output format (default "table", could be "markdown")
-    -m int
-        The maximum number of items that should be returned
-    -d bool
-            Debug mode for more details during API exchange
+| Flag | Default | Description |
+|---|---|---|
+| `-p` | — | YouTube playlist ID |
+| `-c` | — | YouTube channel ID or handle (e.g. `@Squeezie`) |
+| `-o` | `table` | Output format: `table` or `markdown` |
+| `-s` | `total-interest` | Sort by metric (see below). Mutually exclusive with `-strategy` |
+| `-strategy` | — | Score and rank by evaluation strategy (see below). Mutually exclusive with `-s` |
+| `-weights` | — | Override strategy weights: `key=val,key=val` |
+| `-from` | — | Only include videos published on or after this date (`YYYY-MM-DD`) |
+| `-m` | `0` (all) | Maximum number of results to return |
+| `-d` | `false` | Debug mode — prints API URLs and IDs |
 
-### Getting single playlist statistics
+### Sorting (`-s`)
 
-To launch the application You should just precise the ID of the playlist via CLI (this ID could be found in the URL of the playlist, it's the "?playlistId=" variable value).
+`total-interest` (default) · `positive-interest` · `likes` · `total-reaction` · `global-buzz-index` · `positive-negative-coefficient` · `pnc`
 
-    yrank -p PLAYLIST-ID
+### Evaluation strategies (`-strategy`)
 
-To output ranking in markdown:
+Each strategy scores videos by a weighted formula over raw signals, then sorts by `Score`. A `Score` column is prepended to the output.
 
-    yrank -p PLAYLIST-ID -o markdown
+| Slug | Lens | Weight keys |
+|---|---|---|
+| `viral` | Algo/trending — engagement rate on a large audience | `engagement`, `reach`, `comments` |
+| `educational` | Tutorial/reference — likes + discussion, age-discounted | `likes`, `comments`, `recency` |
+| `controversial` | Debate/polarising — dislike ratio × reaction volume | `ratio`, `volume` |
+| `community` | Fan engagement — comments first, sentiment second | `comments`, `sentiment` |
+| `evergreen` | Long-tail/SEO — steady engagement per day of life | `engagement`, `age` |
+| `hype` | Launch velocity — views per day since publication | `velocity` |
 
-### Getting the statistics of a whole user's channel
+**Weight override priority** (highest wins):
+1. Strategy defaults (hardcoded in `youtube/strategy.go`)
+2. `.env` variables: `WEIGHT_<STRATEGY>_<KEY>=0.7` — e.g. `WEIGHT_VIRAL_ENGAGEMENT=0.7`
+3. `-weights` CLI flag: `key=val,key=val` — e.g. `-weights engagement=0.9,reach=0.05,comments=0.05`
 
-First of all, You must find the channel ID of the user. It's not always that easy. Sometimes it's in URL of Youtube's user profile. Sometimes, You should look for it in the code of the page.
+## Usage examples
 
-    yrank -c CHANNEL-ID
-    yrank -c CHANNEL-ID -o markdown -s positive-interest
+```bash
+# Rank a playlist by total interest (default)
+./yrank -p PLAYLIST_ID
 
-### Examples
+# Rank in markdown, sorted by positive interest, top 10
+./yrank -p PLAYLIST_ID -o markdown -s positive-interest -m 10
 
-    ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM
-    ./yrank -p PL2ntRZ1ySWBdatAqf-2_125H4sGzaWngM -o markdown -s positive-interest
+# Rank a whole channel using a handle
+./yrank -c @Squeezie -s positive-interest -o markdown
 
-### Results samples
+# Only videos from 2025 onwards
+./yrank -c @Squeezie -from 2025-01-01 -s positive-interest
 
-* Ranking of FOSDEM 2020 videos https://github.com/fedir/yrank/blob/master/sample_output/fosdem2020_positive_interest.md
-* Ranking of GopherCon 2018 videos https://gist.github.com/fedir/98f6a2ed65e7462a101198dc6f3d5185
-* Ranking of GopherCon UK 2018 videos https://gist.github.com/fedir/6a93e91fa414df6484ba04589ed3269a
-* Ranking of Gopher Academy channel videos https://gist.github.com/fedir/c900d0fb59658f9657253f33e38422fe
+# Rank by viral strategy
+./yrank -p PLAYLIST_ID -strategy viral
+
+# Rank by viral strategy with custom weights
+./yrank -p PLAYLIST_ID -strategy viral -weights engagement=0.9,reach=0.05,comments=0.05
+
+# Save results to a file
+./yrank -p PLAYLIST_ID -strategy evergreen -o markdown > results.md
+```
+
+## Sample outputs
+
+* [KubeCon + CloudNativeCon Europe 2026](sample_output/kubecon_cloudnativecon_europe_2026_positive_interest.md)
+* [CNCF Observability Day Europe 2026](sample_output/cncf_observability_day_europe_2026_positive_interest.md)
+* [Squeezie — Concepts originaux](sample_output/squeezie_concepts_originaux_positive_interest.md)
+* [Squeezie — Full channel](sample_output/squeezie_channel_positive_interest.md)
+* [FOSDEM 2020](sample_output/fosdem2020_positive_interest.md)
