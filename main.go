@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/fedir/yrank/youtube"
 )
@@ -18,6 +19,9 @@ func main() {
 	// Statistics retrieve from Youtube
 	var rankedVideos []youtube.VideoStatistics
 	if cid != "" {
+		if strings.HasPrefix(cid, "@") {
+			cid = youtube.ResolveHandle(cid, c.apikey)
+		}
 		if d {
 			fmt.Printf("Channel ID: %s\n", cid)
 		}

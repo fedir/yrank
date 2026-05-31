@@ -34,6 +34,23 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 	return unique
 }
 
+// ResolveHandle resolves a YouTube handle (e.g. "@Squeezie") to a channel ID.
+func ResolveHandle(handle string, apiKey string) string {
+	url := "https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=" + handle + "&key=" + apiKey
+	body, _, err := httpRequest(url)
+	if err != nil {
+		log.Fatalf("handle resolution request failed: %v", err)
+	}
+	var result ChannelByHandle
+	if err := json.Unmarshal(body, &result); err != nil {
+		log.Fatalf("handle resolution JSON decode failed: %v", err)
+	}
+	if len(result.Items) == 0 {
+		log.Fatalf("no channel found for handle %q", handle)
+	}
+	return result.Items[0].ID
+}
+
 func fetchChannel(url string) Channel {
 	body, _, err := httpRequest(url)
 	if err != nil {

@@ -2,6 +2,13 @@ package youtube
 
 import "time"
 
+// ChannelByHandle is the API response when resolving a handle to a channel ID.
+type ChannelByHandle struct {
+	Items []struct {
+		ID string `json:"id"`
+	} `json:"items"`
+}
+
 // Channel datastructure for JSON unmarshalling
 type Channel struct {
 	NextPageToken string `json:"nextPageToken"`
