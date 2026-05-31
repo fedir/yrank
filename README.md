@@ -59,12 +59,85 @@ Each strategy scores videos by a weighted formula over raw signals, then sorts b
 
 | Slug | Lens | Weight keys |
 |---|---|---|
-| `viral` | Algo/trending — engagement rate on a large audience | `engagement`, `reach`, `comments` |
-| `educational` | Tutorial/reference — likes + discussion, age-discounted | `likes`, `comments`, `recency` |
-| `controversial` | Debate/polarising — dislike ratio × reaction volume | `ratio`, `volume` |
-| `community` | Fan engagement — comments first, sentiment second | `comments`, `sentiment` |
-| `evergreen` | Long-tail/SEO — steady engagement per day of life | `engagement`, `age` |
-| `hype` | Launch velocity — views per day since publication | `velocity` |
+**`viral`** — algo/trending lens
+
+Rewards videos with high engagement rate relative to their audience size.
+
+```
+score = 0.5 × (likes+dislikes)/views
+      + 0.3 × views/max_views        ← reach normalised across dataset
+      + 0.2 × comments/views
+```
+
+---
+
+**`educational`** — tutorial/reference lens
+
+Rewards likes and discussion; penalises recency so old-but-solid content ranks high.
+
+```
+score = 0.6 × likes/views
+      + 0.3 × comments/views
+      + 0.1 × 1/age_days
+```
+
+---
+
+**`controversial`** — debate/polarising lens
+
+Rewards a high dislike ratio multiplied by total reaction volume (log-scaled to reduce outliers).
+
+```
+score = ratio × volume
+  ratio  = (dislikes+1) / (likes+1)
+  volume = log(likes+dislikes+1)
+```
+
+---
+
+**`community`** — fan/community-building lens
+
+Comments are the primary signal; positive sentiment is secondary.
+
+```
+score = 0.5 × comments/views
+      + 0.5 × norm_sentiment
+  norm_sentiment = pnc / (1 + pnc),  pnc = likes/(1+dislikes)
+```
+
+---
+
+**`evergreen`** — long-tail/SEO lens
+
+Rewards videos that accumulate steady engagement per day since publication.
+
+```
+score = 0.5 × (likes+comments)/age_days
+      + 0.5 × 1/age_days
+```
+
+---
+
+**`hype`** — launch/premiere lens
+
+Pure view velocity: views per day since publication.
+
+```
+score = views / age_days
+```
+
+---
+
+`age_days` = days since `PublishedAt` (min 1). `max_views` = highest view count in the dataset (for `viral` normalisation).
+
+| Slug | Weight keys |
+|---|---|
+| `viral` | `engagement`, `reach`, `comments` |
+| `educational` | `likes`, `comments`, `recency` |
+| `controversial` | `ratio`, `volume` |
+| `community` | `comments`, `sentiment` |
+| `evergreen` | `engagement`, `age` |
+| `hype` | `velocity` |
 
 **Weight override priority** (highest wins):
 1. Strategy defaults (hardcoded in `youtube/strategy.go`)
