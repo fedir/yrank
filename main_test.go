@@ -93,6 +93,32 @@ func TestStrategyFlag_empty(t *testing.T) {
 	}
 }
 
+// --- envWeights ---
+
+func TestEnvWeights_parsed(t *testing.T) {
+	os.Setenv("WEIGHT_VIRAL_ENGAGEMENT", "0.8")
+	os.Setenv("WEIGHT_HYPE_VELOCITY", "2.0")
+	defer os.Unsetenv("WEIGHT_VIRAL_ENGAGEMENT")
+	defer os.Unsetenv("WEIGHT_HYPE_VELOCITY")
+
+	w := envWeights()
+	if w["viral_engagement"] != 0.8 {
+		t.Errorf("expected viral_engagement=0.8, got %f", w["viral_engagement"])
+	}
+	if w["hype_velocity"] != 2.0 {
+		t.Errorf("expected hype_velocity=2.0, got %f", w["hype_velocity"])
+	}
+}
+
+func TestEnvWeights_ignoresUnrelated(t *testing.T) {
+	os.Setenv("YOUTUBE_API_KEY", "dummy")
+	defer os.Unsetenv("YOUTUBE_API_KEY")
+	w := envWeights()
+	if _, ok := w["youtube_api_key"]; ok {
+		t.Error("envWeights should not include YOUTUBE_API_KEY")
+	}
+}
+
 // --- -weights flag parsing ---
 
 func TestParseWeightsFlag(t *testing.T) {
