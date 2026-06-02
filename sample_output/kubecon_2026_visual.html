@@ -21,11 +21,16 @@
   /* Viewport wrapper — fills the screen and centers the scaled canvas */
   .viewport {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+  }
+
+  /* Portrait: allow vertical scroll so the scaled canvas is readable */
+  @media (orientation: portrait) {
+    html, body { overflow-y: auto; overflow-x: hidden; }
+    .viewport  { align-items: flex-start; padding: 16px 0; }
   }
 
   /* Fixed 1200×628 design canvas — scaled to fit any viewport */
@@ -629,10 +634,22 @@
     var DESIGN_W = 1200, DESIGN_H = 628;
     var container = document.querySelector('.container');
     function scale() {
-      var scaleX = window.innerWidth  / DESIGN_W;
-      var scaleY = window.innerHeight / DESIGN_H;
-      var s = Math.min(scaleX, scaleY);
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var portrait = vh > vw;
+      var s;
+      if (portrait) {
+        // Fill width; canvas height will overflow → vertical scroll
+        s = vw / DESIGN_W;
+      } else {
+        // Fit both dimensions, no scroll needed
+        s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+      }
       container.style.transform = 'scale(' + s + ')';
+      // In portrait, reserve vertical space so the viewport scrolls correctly
+      container.parentElement.style.minHeight = portrait
+        ? Math.ceil(DESIGN_H * s + 32) + 'px'
+        : '100vh';
     }
     scale();
     window.addEventListener('resize', scale);
