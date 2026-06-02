@@ -40,7 +40,7 @@
     flex-shrink: 0;
   }
 
-  /* ── Portrait: tabbed single-column view ── */
+  /* ── Portrait: all 3 columns stacked vertically, scroll to read ── */
   @media (orientation: portrait) {
     html, body { overflow-y: auto; overflow-x: hidden; height: auto; }
 
@@ -68,51 +68,11 @@
     .main-subtitle { font-size: 11px; }
     .eyebrow-text  { font-size: 11px; }
 
-    /* Tab bar — shown only in portrait */
-    .tab-bar {
-      display: flex !important;
-      gap: 0;
-      margin-bottom: 14px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #2a2a2a;
-      flex-shrink: 0;
-    }
-
-    .tab-btn {
-      flex: 1;
-      background: #141414;
-      border: none;
-      color: #777;
-      font-family: 'Roboto', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 10px 6px;
-      cursor: pointer;
-      border-right: 1px solid #2a2a2a;
-      transition: background 0.15s, color 0.15s;
-      text-align: center;
-      line-height: 1.3;
-    }
-    .tab-btn:last-child { border-right: none; }
-
-    .tab-btn.active-engagement { background: #1a0808; color: #ff4444; }
-    .tab-btn.active-views      { background: #08101a; color: #4a9eff; }
-    .tab-btn.active-likes      { background: #081408; color: #4caf50; }
-
-    /* Grid becomes single-column; inactive columns hidden */
+    /* Single-column stacked grid */
     .columns {
       grid-template-columns: 1fr;
-      gap: 0;
+      gap: 24px;
     }
-
-    .col-engagement,
-    .col-views,
-    .col-likes { display: none; }
-
-    .col-engagement.tab-active,
-    .col-views.tab-active,
-    .col-likes.tab-active { display: block; }
 
     .col-body  { gap: 10px; }
     .mini-card { padding: 12px 14px; }
@@ -433,18 +393,11 @@
 
   <div class="divider"></div>
 
-  <!-- Tab bar (portrait only) -->
-  <div class="tab-bar" style="display:none">
-    <button class="tab-btn active-engagement" onclick="switchTab('engagement',this)">🎯 Engagement</button>
-    <button class="tab-btn" onclick="switchTab('views',this)">👁 Views</button>
-    <button class="tab-btn" onclick="switchTab('likes',this)">👍 Likes</button>
-  </div>
-
   <!-- Three columns -->
   <div class="columns">
 
     <!-- ── COLUMN 1: Engagement ── -->
-    <div class="col-engagement tab-active">
+    <div class="col-engagement">
       <div class="col-header col-accent-engagement">
         <div class="col-icon col-icon-engagement">🎯</div>
         <div>
@@ -720,7 +673,6 @@
 </div><!-- .viewport -->
 
 <script>
-  // ── Responsive scaling ──
   (function () {
     var DESIGN_W = 1200, DESIGN_H = 628;
     var container = document.querySelector('.container');
@@ -737,28 +689,6 @@
     scale();
     window.addEventListener('resize', scale);
   })();
-
-  // ── Portrait tab switching ──
-  var activeTab = 'engagement';
-
-  function switchTab(name, btn) {
-    // Hide all columns
-    ['engagement', 'views', 'likes'].forEach(function (t) {
-      document.querySelector('.col-' + t).classList.remove('tab-active');
-    });
-    // Show selected column
-    document.querySelector('.col-' + name).classList.add('tab-active');
-
-    // Update button styles
-    document.querySelectorAll('.tab-btn').forEach(function (b) {
-      b.className = 'tab-btn';
-    });
-    btn.classList.add('active-' + name);
-
-    activeTab = name;
-    // Scroll to top of content
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 </script>
 </body>
 </html>
