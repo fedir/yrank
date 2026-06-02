@@ -59,7 +59,9 @@ func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore, 
 		for i, slug := range youtube.StrategyOrder {
 			scoreHeaders[i] = "Score:" + slug
 		}
-		headers = append(scoreHeaders, baseHeaders...)
+		// Title, URL first, then strategy scores, then remaining metrics
+		headers = append([]string{"Title", "URL"}, scoreHeaders...)
+		headers = append(headers, baseHeaders[2:]...)
 	case showScore:
 		headers = append([]string{"Score"}, baseHeaders...)
 	default:
@@ -130,7 +132,9 @@ func buildRow(vsi youtube.VideoStatistics, of string, showScore, allScores bool)
 		for i, slug := range youtube.StrategyOrder {
 			scores[i] = fmt.Sprintf("%.6f", vsi.AllScores[slug])
 		}
-		return append(scores, base...)
+		// Title, URL first, then scores, then remaining metrics
+		row := append([]string{base[0], base[1]}, scores...)
+		return append(row, base[2:]...)
 	case showScore:
 		return append([]string{fmt.Sprintf("%.6f", vsi.Score)}, base...)
 	default:

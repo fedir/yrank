@@ -374,15 +374,22 @@ func TestPrintTo_CSV_allScores_headers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("invalid CSV: %v", err)
 	}
-	// first N headers should be Score:<slug> in StrategyOrder
+	// first two columns must be Title and URL
+	if records[0][0] != "Title" {
+		t.Errorf("header[0]: got %q want %q", records[0][0], "Title")
+	}
+	if records[0][1] != "URL" {
+		t.Errorf("header[1]: got %q want %q", records[0][1], "URL")
+	}
+	// next N headers should be Score:<slug> in StrategyOrder
 	for i, slug := range youtube.StrategyOrder {
 		want := "Score:" + slug
-		if records[0][i] != want {
-			t.Errorf("header[%d]: got %q want %q", i, records[0][i], want)
+		if records[0][2+i] != want {
+			t.Errorf("header[%d]: got %q want %q", 2+i, records[0][2+i], want)
 		}
 	}
-	// total columns = 6 strategy scores + 12 base
-	wantCols := len(youtube.StrategyOrder) + 12
+	// total columns = 2 (title+url) + 6 strategy scores + 10 remaining metrics
+	wantCols := 2 + len(youtube.StrategyOrder) + 10
 	if len(records[0]) != wantCols {
 		t.Errorf("expected %d columns, got %d", wantCols, len(records[0]))
 	}
