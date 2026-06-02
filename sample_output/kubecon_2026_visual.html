@@ -18,22 +18,16 @@
     overflow: hidden;
   }
 
-  /* Viewport wrapper — fills the screen and centers the scaled canvas */
+  /* ── Landscape: fixed canvas scaled to viewport ── */
   .viewport {
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
 
-  /* Portrait: allow vertical scroll so the scaled canvas is readable */
-  @media (orientation: portrait) {
-    html, body { overflow-y: auto; overflow-x: hidden; }
-    .viewport  { align-items: flex-start; padding: 16px 0; }
-  }
-
-  /* Fixed 1200×628 design canvas — scaled to fit any viewport */
   .container {
     width: 1200px;
     height: 628px;
@@ -44,6 +38,66 @@
     flex-direction: column;
     transform-origin: center center;
     flex-shrink: 0;
+  }
+
+  /* ── Portrait: natural vertical flow, no transform ── */
+  @media (orientation: portrait) {
+    html, body { overflow-y: auto; overflow-x: hidden; height: auto; }
+
+    .viewport {
+      height: auto;
+      min-height: 100vh;
+      overflow: visible;
+      align-items: flex-start;
+    }
+
+    .container {
+      width: 100%;
+      height: auto;
+      padding: 20px 16px 24px;
+      transform: none !important;
+    }
+
+    .header {
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .header-badges {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .main-title { font-size: 20px; }
+    .main-subtitle { font-size: 11px; }
+    .eyebrow-text { font-size: 11px; }
+
+    /* Stack the three columns vertically */
+    .columns {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    /* Give each column full breathing room */
+    .col-body { gap: 10px; }
+
+    .mini-card { padding: 11px 13px; }
+    .mini-title { font-size: 13px; -webkit-line-clamp: 3; }
+    .mini-score { font-size: 15px; }
+    .col-title  { font-size: 14px; }
+
+    /* Section label between stacked columns */
+    .col-header { margin-top: 4px; }
+
+    .footer {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 16px;
+    }
+
+    .footer-formula { font-size: 10.5px; }
   }
 
   .container::before {
@@ -637,19 +691,13 @@
       var vw = window.innerWidth;
       var vh = window.innerHeight;
       var portrait = vh > vw;
-      var s;
       if (portrait) {
-        // Fill width; canvas height will overflow → vertical scroll
-        s = vw / DESIGN_W;
+        // CSS handles portrait layout — no transform needed
+        container.style.transform = '';
       } else {
-        // Fit both dimensions, no scroll needed
-        s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+        var s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+        container.style.transform = 'scale(' + s + ')';
       }
-      container.style.transform = 'scale(' + s + ')';
-      // In portrait, reserve vertical space so the viewport scrolls correctly
-      container.parentElement.style.minHeight = portrait
-        ? Math.ceil(DESIGN_H * s + 32) + 'px'
-        : '100vh';
     }
     scale();
     window.addEventListener('resize', scale);
