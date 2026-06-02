@@ -1,4 +1,5 @@
 .DS_Store
+coverage.txt
 notes.md
 yrank
 config.toml
