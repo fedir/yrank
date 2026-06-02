@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KubeCon EU 2026 — Top Picks by yrank</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #0f0f0f;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+  }
+
+  /* Viewport wrapper — fills the screen and centers the scaled canvas */
+  .viewport {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Fixed 1200×628 design canvas — scaled to fit any viewport */
+  .container {
+    width: 1200px;
+    height: 628px;
+    padding: 28px 36px 22px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform-origin: center center;
+    flex-shrink: 0;
+  }
+
+  .container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .yt-pill {
+    background: #ff0000;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+  }
+
+  .eyebrow-text { color: #bbb; font-size: 12px; }
+
+  .main-title {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.4px;
+    line-height: 1.15;
+  }
+
+  .main-title span { color: #ff0000; }
+
+  .main-subtitle { margin-top: 4px; color: #999; font-size: 12.5px; }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    background: #181818;
+    border: 1px solid #2a2a2a;
+    border-radius: 7px;
+    padding: 7px 13px;
+    text-align: center;
+  }
+
+  .badge .num { font-size: 20px; font-weight: 700; line-height: 1; }
+  .badge .lbl { font-size: 10px; color: #888; margin-top: 2px; letter-spacing: 0.2px; }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    flex-shrink: 0;
+    background: linear-gradient(90deg, #ff0000, #ff000022 50%, transparent);
+    margin-bottom: 14px;
+  }
+
+  /* ── Three-column grid ── */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── Column header ── */
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 9px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #222;
+    flex-shrink: 0;
+  }
+
+  .col-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .col-icon-engagement { background: #1a0a0a; border: 1px solid #ff000033; }
+  .col-icon-views      { background: #0a1220; border: 1px solid #1a4a8a33; }
+  .col-icon-likes      { background: #0a1a0a; border: 1px solid #1a5a1a33; }
+
+  .col-title { font-size: 13px; font-weight: 700; color: #e0e0e0; }
+  .col-desc  { font-size: 10.5px; color: #666; margin-top: 1px; }
+
+  .col-accent-engagement { border-bottom-color: #ff0000; }
+  .col-accent-views      { border-bottom-color: #4a9eff; }
+  .col-accent-likes      { border-bottom-color: #4caf50; }
+
+  /* ── Column scroll container ── */
+  .col-body {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  /* ── Mini card ── */
+  .mini-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 7px;
+    padding: 9px 11px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mini-card:first-child { background: #181818; border-color: #2a2a2a; }
+
+  .mini-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    border-radius: 2px 0 0 2px;
+    opacity: 0;
+  }
+
+  .mini-card:first-child::before { opacity: 1; }
+
+  .col-engagement .mini-card:first-child::before { background: #ff0000; }
+  .col-views      .mini-card:first-child::before { background: #4a9eff; }
+  .col-likes      .mini-card:first-child::before { background: #4caf50; }
+
+  .mini-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+    width: 18px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .col-engagement .mini-card:first-child .mini-rank { color: #ff4444; }
+  .col-views      .mini-card:first-child .mini-rank { color: #4a9eff; }
+  .col-likes      .mini-card:first-child .mini-rank { color: #4caf50; }
+
+  .mini-info { flex: 1; min-width: 0; }
+
+  .mini-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #ddd;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mini-card:first-child .mini-title { color: #fff; font-weight: 600; }
+
+  .mini-stats {
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .mini-pill {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 11px;
+    color: #999;
+  }
+
+  .mini-pill .v { font-weight: 600; color: #ccc; }
+
+  .mini-bar-wrap { margin-top: 5px; }
+
+  .mini-bar-track {
+    height: 3px;
+    background: #222;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .mini-bar-fill { height: 100%; border-radius: 2px; }
+  .col-engagement .mini-bar-fill { background: linear-gradient(90deg, #ff6666, #ff0000); }
+  .col-views      .mini-bar-fill { background: linear-gradient(90deg, #6ab3ff, #4a9eff); }
+  .col-likes      .mini-bar-fill { background: linear-gradient(90deg, #81c784, #4caf50); }
+
+  .mini-score {
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    padding-top: 1px;
+    white-space: nowrap;
+  }
+
+  .col-engagement .mini-score { color: #cc4444; }
+  .col-engagement .mini-card:first-child .mini-score { color: #ff4444; }
+  .col-views .mini-score      { color: #4a9eff; }
+  .col-likes .mini-score      { color: #4caf50; }
+
+  /* tags */
+  .tag {
+    font-size: 9.5px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 20px;
+  }
+  .tag-5g       { background: #0a2e1a; color: #80cbc4; border: 1px solid #1a5a3a; }
+  .tag-security { background: #1a0a2e; color: #b388ff; border: 1px solid #4a1a7a; }
+  .tag-ai       { background: #0a1a2e; color: #64b5f6; border: 1px solid #1a4a7a; }
+  .tag-scale    { background: #2e1a0a; color: #ffb74d; border: 1px solid #5a3a0a; }
+  .tag-hpc      { background: #2e2a0a; color: #fff176; border: 1px solid #5a4a0a; }
+  .tag-keynote  { background: #2a1a00; color: #ffcc80; border: 1px solid #664400; }
+  .tag-net      { background: #001a2a; color: #80d8ff; border: 1px solid #004466; }
+  .tag-obs      { background: #1a1a00; color: #e6ee9c; border: 1px solid #444400; }
+  .tag-gateway  { background: #1a001a; color: #ea80fc; border: 1px solid #440044; }
+
+  /* ── Footer ── */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #1e1e1e;
+    flex-shrink: 0;
+  }
+
+  .yrank-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #181818;
+    border: 1px solid #2a2a2a;
+    border-radius: 5px;
+    padding: 4px 11px;
+  }
+
+  .yrank-badge .dot { width: 7px; height: 7px; background: #ff0000; border-radius: 50%; }
+  .yrank-badge span { font-size: 12px; font-weight: 600; color: #bbb; }
+
+  .footer-left { display: flex; align-items: center; gap: 10px; }
+  .footer-note { font-size: 11px; color: #555; }
+  .footer-note strong { color: #777; }
+  .footer-formula { font-size: 11px; color: #555; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="viewport">
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="eyebrow">
+        <span class="yt-pill">▶ YouTube</span>
+        <span class="eyebrow-text">KubeCon + CloudNativeCon Europe 2026 · 411 talks · ~300h of content</span>
+      </div>
+      <div class="main-title">Does popularity <span>equal quality?</span></div>
+      <div class="main-subtitle">Three rankings, same playlist — compare what the crowd watched vs. what resonated most</div>
+    </div>
+    <div class="header-badges">
+      <div class="badge"><div class="num">411</div><div class="lbl">talks</div></div>
+      <div class="badge"><div class="num" style="color:#ff4444">~300h</div><div class="lbl">watch time</div></div>
+      <div class="badge"><div class="num" style="color:#4a9eff">4 769</div><div class="lbl">max views</div></div>
+      <div class="badge"><div class="num" style="color:#4caf50">55</div><div class="lbl">max likes</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Three columns -->
+  <div class="columns">
+
+    <!-- ── COLUMN 1: Engagement ── -->
+    <div class="col-engagement">
+      <div class="col-header col-accent-engagement">
+        <div class="col-icon col-icon-engagement">🎯</div>
+        <div>
+          <div class="col-title">Top 5 by Engagement Rate</div>
+          <div class="col-desc">(likes − dislikes) ÷ views · yrank score</div>
+        </div>
+      </div>
+      <div class="col-body">
+
+        <div class="mini-card">
+          <div class="mini-rank">#1</div>
+          <div class="mini-info">
+            <div class="mini-title">From Chaos to Control: Managing Apps on Private Cellular Networks — Luis Ariza</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">69</span></span>
+              <span class="mini-pill">👍 <span class="v">11</span></span>
+              <span class="mini-pill">⚡ <span class="v">11</span></span>
+              <span class="tag tag-5g">5G + K8s</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
+          </div>
+          <div class="mini-score">15.9%</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#2</div>
+          <div class="mini-info">
+            <div class="mini-title">Locking Down Ray Serve: How to Secure Your ML Models — Kateryna Hrytsaienko, Valtech</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">81</span></span>
+              <span class="mini-pill">👍 <span class="v">8</span></span>
+              <span class="mini-pill">⚡ <span class="v">8</span></span>
+              <span class="tag tag-security">ML Security</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:62%"></div></div></div>
+          </div>
+          <div class="mini-score">9.9%</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#3</div>
+          <div class="mini-info">
+            <div class="mini-title">To Swap or Not To Swap: Memory Management for AI Workloads — Nic Vermande</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">107</span></span>
+              <span class="mini-pill">👍 <span class="v">7</span></span>
+              <span class="mini-pill">⚡ <span class="v">7</span></span>
+              <span class="tag tag-ai">AI Infra</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:41%"></div></div></div>
+          </div>
+          <div class="mini-score">6.5%</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#4</div>
+          <div class="mini-info">
+            <div class="mini-title">Smart Routing at Scale: How Spotify's XDS Control Plane Cut 75% — Epstein & Hristova</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">175</span></span>
+              <span class="mini-pill">👍 <span class="v">11</span></span>
+              <span class="mini-pill">⚡ <span class="v">11</span></span>
+              <span class="tag tag-scale">Spotify · XDS</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:40%"></div></div></div>
+          </div>
+          <div class="mini-score">6.3%</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#5</div>
+          <div class="mini-info">
+            <div class="mini-title">Slinky Expanded: Slurm, Kubernetes, and DRA — Praveen Krishna & Marlow Warnicke</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">208</span></span>
+              <span class="mini-pill">👍 <span class="v">12</span></span>
+              <span class="mini-pill">⚡ <span class="v">12</span></span>
+              <span class="tag tag-hpc">HPC + K8s</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:36%"></div></div></div>
+          </div>
+          <div class="mini-score">5.8%</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── COLUMN 2: Most Viewed ── -->
+    <div class="col-views">
+      <div class="col-header col-accent-views">
+        <div class="col-icon col-icon-views">👁</div>
+        <div>
+          <div class="col-title">Top 5 Most Viewed</div>
+          <div class="col-desc">Raw view count · what the algorithm promoted</div>
+        </div>
+      </div>
+      <div class="col-body">
+
+        <div class="mini-card">
+          <div class="mini-rank">#1</div>
+          <div class="mini-info">
+            <div class="mini-title">Day 0 — KubeCon + CloudNativeCon 2026 Highlights from Amsterdam</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">4 769</span></span>
+              <span class="mini-pill">👍 <span class="v">13</span></span>
+              <span class="tag tag-keynote">Highlights</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
+          </div>
+          <div class="mini-score">4 769</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#2</div>
+          <div class="mini-info">
+            <div class="mini-title">Keynote: Welcome + Opening Remarks — Jonathan Bryce & Chris Aniszczyk</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">3 470</span></span>
+              <span class="mini-pill">👍 <span class="v">33</span></span>
+              <span class="tag tag-keynote">Keynote</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:73%"></div></div></div>
+          </div>
+          <div class="mini-score">3 470</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#3</div>
+          <div class="mini-info">
+            <div class="mini-title">Day 1 — KubeCon + CloudNativeCon 2026 Highlights from Amsterdam</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">2 172</span></span>
+              <span class="mini-pill">👍 <span class="v">21</span></span>
+              <span class="tag tag-keynote">Highlights</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:46%"></div></div></div>
+          </div>
+          <div class="mini-score">2 172</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#4</div>
+          <div class="mini-info">
+            <div class="mini-title">Keynote: The Future of Cloud Native Is… Agentic — Lin Sun, Solo.io</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">2 112</span></span>
+              <span class="mini-pill">👍 <span class="v">36</span></span>
+              <span class="tag tag-ai">Agentic AI</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:44%"></div></div></div>
+          </div>
+          <div class="mini-score">2 112</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#5</div>
+          <div class="mini-info">
+            <div class="mini-title">Gateway API: Bridging the Gap from Ingress to the Future — Panel</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">1 987</span></span>
+              <span class="mini-pill">👍 <span class="v">49</span></span>
+              <span class="tag tag-gateway">Gateway API</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:42%"></div></div></div>
+          </div>
+          <div class="mini-score">1 987</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── COLUMN 3: Most Liked ── -->
+    <div class="col-likes">
+      <div class="col-header col-accent-likes">
+        <div class="col-icon col-icon-likes">👍</div>
+        <div>
+          <div class="col-title">Top 5 Most Liked</div>
+          <div class="col-desc">Raw like count · what people endorsed</div>
+        </div>
+      </div>
+      <div class="col-body">
+
+        <div class="mini-card">
+          <div class="mini-rank">#1</div>
+          <div class="mini-info">
+            <div class="mini-title">Demystifying the Kubernetes Network Stack (From Pod to Pod) — Simone Rodigari, Microsoft</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">1 284</span></span>
+              <span class="mini-pill">👍 <span class="v">55</span></span>
+              <span class="tag tag-net">Networking</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
+          </div>
+          <div class="mini-score">55</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#2</div>
+          <div class="mini-info">
+            <div class="mini-title">Gateway API: Bridging the Gap from Ingress to the Future — Panel</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">1 987</span></span>
+              <span class="mini-pill">👍 <span class="v">49</span></span>
+              <span class="tag tag-gateway">Gateway API</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:89%"></div></div></div>
+          </div>
+          <div class="mini-score">49</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#3</div>
+          <div class="mini-info">
+            <div class="mini-title">Keynote: The Future of Cloud Native Is… Agentic — Lin Sun, Solo.io</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">2 112</span></span>
+              <span class="mini-pill">👍 <span class="v">36</span></span>
+              <span class="tag tag-ai">Agentic AI</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:65%"></div></div></div>
+          </div>
+          <div class="mini-score">36</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#4</div>
+          <div class="mini-info">
+            <div class="mini-title">Keynote: Welcome + Opening Remarks — Jonathan Bryce & Chris Aniszczyk</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">3 470</span></span>
+              <span class="mini-pill">👍 <span class="v">33</span></span>
+              <span class="tag tag-keynote">Keynote</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:60%"></div></div></div>
+          </div>
+          <div class="mini-score">33</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-rank">#5</div>
+          <div class="mini-info">
+            <div class="mini-title">Retroactive Sampling with OpenTelemetry: Cut 90% Tracing Cost — Khavronenko & Jiekun</div>
+            <div class="mini-stats">
+              <span class="mini-pill">👁 <span class="v">890</span></span>
+              <span class="mini-pill">👍 <span class="v">29</span></span>
+              <span class="tag tag-obs">Observability</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:53%"></div></div></div>
+          </div>
+          <div class="mini-score">29</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="yrank-badge">
+        <div class="dot"></div>
+        <span>github.com/fedir/yrank</span>
+      </div>
+      <div class="footer-note">open-source · <strong>Go</strong> · YouTube Data API v3</div>
+    </div>
+    <div class="footer-formula">
+      🎯 Engagement = (likes − dislikes) ÷ views &nbsp;·&nbsp; surfaces niche brilliance over promoted content
+    </div>
+  </div>
+
+</div>
+</div><!-- .viewport -->
+
+<script>
+  (function () {
+    var DESIGN_W = 1200, DESIGN_H = 628;
+    var container = document.querySelector('.container');
+    function scale() {
+      var scaleX = window.innerWidth  / DESIGN_W;
+      var scaleY = window.innerHeight / DESIGN_H;
+      var s = Math.min(scaleX, scaleY);
+      container.style.transform = 'scale(' + s + ')';
+    }
+    scale();
+    window.addEventListener('resize', scale);
+  })();
+</script>
+</body>
+</html>
