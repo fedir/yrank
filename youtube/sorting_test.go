@@ -87,6 +87,117 @@ func TestSortBy_positiveNegativeCoefficient(t *testing.T) {
 	}
 }
 
+// --- data integrity after sorting ---
+
+// snapshot captures the metric values of each video by title so we can verify
+// that sorting reorders without altering any field values.
+func snapshot(vs []VideoStatistics) map[string]VideoStatistics {
+	m := make(map[string]VideoStatistics, len(vs))
+	for _, v := range vs {
+		m[v.Title] = v
+	}
+	return m
+}
+
+func assertFieldsUnchanged(t *testing.T, label string, before, after map[string]VideoStatistics) {
+	t.Helper()
+	for title, b := range before {
+		a, ok := after[title]
+		if !ok {
+			t.Errorf("%s: video %q disappeared after sort", label, title)
+			continue
+		}
+		if b.ViewCount != a.ViewCount || b.LikeCount != a.LikeCount ||
+			b.DislikeCount != a.DislikeCount || b.CommentCount != a.CommentCount ||
+			b.TotalReaction != a.TotalReaction || b.GlobalBuzzIndex != a.GlobalBuzzIndex ||
+			b.TotalInterestingness != a.TotalInterestingness ||
+			b.PositiveInterestingness != a.PositiveInterestingness ||
+			b.PositiveNegativeCoefficient != a.PositiveNegativeCoefficient {
+			t.Errorf("%s: field values changed for video %q after sort", label, title)
+		}
+	}
+}
+
+func TestSortBy_doesNotMutateFields(t *testing.T) {
+	modes := []string{
+		"total-interest", "positive-interest", "likes",
+		"total-reaction", "global-buzz-index", "pnc",
+		"positive-negative-coefficient", "",
+	}
+	for _, mode := range modes {
+		vs := sampleVideos()
+		before := snapshot(vs)
+		SortBy(vs, mode)
+		after := snapshot(vs)
+		assertFieldsUnchanged(t, "SortBy/"+mode, before, after)
+	}
+}
+
+func TestApplyStrategy_doesNotMutateFields(t *testing.T) {
+	strategies := []string{"viral", "educational", "controversial", "community", "evergreen", "hype"}
+	for _, slug := range strategies {
+		vs := sampleVideos()
+		before := snapshot(vs)
+		s := Strategies[slug]
+		ApplyStrategy(vs, slug, s.DefaultWeights)
+		after := snapshot(vs)
+		assertFieldsUnchanged(t, "ApplyStrategy/"+slug, before, after)
+	}
+}
+
+func TestApplyAllStrategies_doesNotMutateFields(t *testing.T) {
+	vs := sampleVideos()
+	before := snapshot(vs)
+	ApplyAllStrategies(vs)
+	after := snapshot(vs)
+	assertFieldsUnchanged(t, "ApplyAllStrategies", before, after)
+}
+
+func TestApplyAllStrategies_allSlugsPresent(t *testing.T) {
+	vs := sampleVideos()
+	ApplyAllStrategies(vs)
+	for _, v := range vs {
+		if len(v.AllScores) != len(StrategyOrder) {
+			t.Errorf("video %q: expected %d AllScores entries, got %d", v.Title, len(StrategyOrder), len(v.AllScores))
+		}
+		for _, slug := range StrategyOrder {
+			if _, ok := v.AllScores[slug]; !ok {
+				t.Errorf("video %q: missing AllScores[%q]", v.Title, slug)
+			}
+		}
+	}
+}
+
+func TestApplyAllStrategies_scoresNonNegative(t *testing.T) {
+	vs := sampleVideos()
+	ApplyAllStrategies(vs)
+	for _, v := range vs {
+		for slug, score := range v.AllScores {
+			if score < 0 {
+				t.Errorf("video %q strategy %q: negative score %f", v.Title, slug, score)
+			}
+		}
+	}
+}
+
+func TestApplyAllStrategies_emptySlice(t *testing.T) {
+	// must not panic on empty input
+	ApplyAllStrategies([]VideoStatistics{})
+}
+
+func TestApplyAllStrategies_zeroViews(t *testing.T) {
+	// videos with zero views must not produce NaN/Inf scores
+	vs := []VideoStatistics{
+		{Title: "zero", ViewCount: 0, LikeCount: 0, CommentCount: 0, PublishedAt: time.Now()},
+	}
+	ApplyAllStrategies(vs)
+	for slug, score := range vs[0].AllScores {
+		if score != score { // NaN check
+			t.Errorf("strategy %q produced NaN score for zero-view video", slug)
+		}
+	}
+}
+
 // --- uploadsPlaylistID ---
 
 func TestUploadsPlaylistID(t *testing.T) {
