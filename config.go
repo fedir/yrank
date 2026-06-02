@@ -69,7 +69,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw stri
 	var (
 		playlistID  = flag.String("p", "", "Youtube playlist ID")
 		channelID   = flag.String("c", "", "Youtube channel ID")
-		out         = flag.String("o", "table", "Output format {table|markdown}")
+		out         = flag.String("o", "table", "Output format {table|markdown|csv}")
 		sort        = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
 		strat       = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
 		maxRes      = flag.Int("m", 0, "Max items to return (0 = all)")
@@ -85,7 +85,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw stri
 	if *playlistID != "" && *channelID != "" {
 		log.Fatalln("Playlist ID & channel ID cannot be used together")
 	}
-	if *out != "table" && *out != "markdown" {
+	if *out != "table" && *out != "markdown" && *out != "csv" {
 		log.Fatalln("Unknown output format")
 	}
 	if *sort != "" && *strat != "" {
