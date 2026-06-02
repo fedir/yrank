@@ -26,6 +26,7 @@ go test -race -run TestName ./youtube/...
 # Run the binary
 ./yrank -p PLAYLIST_ID
 ./yrank -c CHANNEL_ID -s positive-interest -o markdown -m 10
+./yrank -c CHANNEL_ID -o csv -out export.csv
 ```
 
 ## Configuration
