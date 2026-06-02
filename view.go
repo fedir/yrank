@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 
@@ -11,6 +12,10 @@ import (
 )
 
 func print(vs []youtube.VideoStatistics, of string, showScore bool) {
+	printTo(os.Stdout, vs, of, showScore)
+}
+
+func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore bool) {
 	headers := []string{
 		"Title",
 		"URL",
@@ -30,7 +35,7 @@ func print(vs []youtube.VideoStatistics, of string, showScore bool) {
 	}
 
 	if of == "csv" {
-		w := csv.NewWriter(os.Stdout)
+		w := csv.NewWriter(out)
 		_ = w.Write(headers)
 		for _, vsi := range vs {
 			if vsi.Title == "" {
@@ -59,7 +64,7 @@ func print(vs []youtube.VideoStatistics, of string, showScore bool) {
 		return
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(out)
 
 	if of == "table" {
 		table.SetRowLine(true)

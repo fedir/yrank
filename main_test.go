@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
 	"flag"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -145,5 +148,96 @@ func TestWeightsFlag_roundtrip(t *testing.T) {
 	w := parseWeightsFlag(weightsRaw)
 	if w["engagement"] != 0.9 {
 		t.Errorf("expected engagement=0.9 from CLI, got %f", w["engagement"])
+	}
+}
+
+// --- CSV output ---
+
+func sampleVideos() []youtube.VideoStatistics {
+	pub, _ := time.Parse("2006-01-02", "2025-01-15")
+	return []youtube.VideoStatistics{
+		{
+			Title:                      "Video One",
+			URL:                        "https://youtu.be/aaa",
+			PublishedAt:                pub,
+			PositiveInterestingness:    0.0512,
+			PositiveNegativeCoefficient: 1234.0,
+			TotalInterestingness:       0.0530,
+			ViewCount:                  10000,
+			LikeCount:                  512,
+			DislikeCount:               0,
+			CommentCount:               100,
+			TotalReaction:              612,
+			GlobalBuzzIndex:            6120000,
+		},
+		{Title: ""}, // blank title must be skipped
+	}
+}
+
+func TestPrintTo_CSV_headers(t *testing.T) {
+	var buf bytes.Buffer
+	printTo(&buf, sampleVideos(), "csv", false)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, err := r.ReadAll()
+	if err != nil {
+		t.Fatalf("invalid CSV: %v", err)
+	}
+	if len(records) == 0 {
+		t.Fatal("expected at least a header row")
+	}
+	want := []string{"Title", "URL", "Published at", "Positive interestingness",
+		"Positive negative coefficient", "Total interestingness",
+		"Views", "Likes", "Dislikes", "Comments", "Total reaction", "Global buzz index"}
+	for i, h := range want {
+		if records[0][i] != h {
+			t.Errorf("header[%d]: got %q want %q", i, records[0][i], h)
+		}
+	}
+}
+
+func TestPrintTo_CSV_row_count(t *testing.T) {
+	var buf bytes.Buffer
+	printTo(&buf, sampleVideos(), "csv", false)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, _ := r.ReadAll()
+	// 1 header + 1 real video (blank-title entry must be skipped)
+	if len(records) != 2 {
+		t.Errorf("expected 2 rows (header+1 video), got %d", len(records))
+	}
+}
+
+func TestPrintTo_CSV_values(t *testing.T) {
+	var buf bytes.Buffer
+	printTo(&buf, sampleVideos(), "csv", false)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, _ := r.ReadAll()
+	row := records[1]
+	if row[0] != "Video One" {
+		t.Errorf("Title: got %q want %q", row[0], "Video One")
+	}
+	if row[6] != "10000" {
+		t.Errorf("Views: got %q want %q", row[6], "10000")
+	}
+	if row[3] != "0.0512" {
+		t.Errorf("PositiveInterestingness: got %q want %q", row[3], "0.0512")
+	}
+}
+
+func TestPrintTo_CSV_withScore(t *testing.T) {
+	vs := sampleVideos()
+	vs[0].Score = 0.987654
+	var buf bytes.Buffer
+	printTo(&buf, vs, "csv", true)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, _ := r.ReadAll()
+	if records[0][0] != "Score" {
+		t.Errorf("first header should be Score, got %q", records[0][0])
+	}
+	if records[1][0] != "0.987654" {
+		t.Errorf("Score value: got %q want %q", records[1][0], "0.987654")
 	}
 }
