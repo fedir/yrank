@@ -44,8 +44,8 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-m`, `-from`, `-strategy`, `-weights`, `-d` flags
-- `view.go`: `print()` renders results as table or markdown using `tablewriter`
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-d` flags
+- `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 
 **`youtube` package** — all YouTube API logic:
@@ -66,6 +66,10 @@ Two-layer design:
 | `PositiveNegativeCoefficient` | likes / (1 + dislikes) |
 
 ## Sorting options
+
+`-o` flag values: `table` (default), `markdown`, `csv`
+
+`-out FILE` writes output atomically to a file (temp-rename pattern). Prefer over shell redirection for large exports.
 
 `-s` flag values: `likes`, `total-interest` (default), `positive-interest`, `total-reaction`, `global-buzz-index`, `positive-negative-coefficient` (alias: `pnc`)
 

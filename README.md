@@ -41,7 +41,8 @@ The key is also read directly from the environment if set there.
 |---|---|---|
 | `-p` | — | YouTube playlist ID |
 | `-c` | — | YouTube channel ID or handle (e.g. `@Squeezie`) |
-| `-o` | `table` | Output format: `table` or `markdown` |
+| `-o` | `table` | Output format: `table`, `markdown`, or `csv` |
+| `-out` | — | Write output to file atomically (safer than shell redirection for large exports) |
 | `-s` | `total-interest` | Sort by metric (see below). Mutually exclusive with `-strategy` |
 | `-strategy` | — | Score and rank by evaluation strategy (see below). Mutually exclusive with `-s` |
 | `-weights` | — | Override strategy weights: `key=val,key=val` |
@@ -165,8 +166,11 @@ score = views / age_days
 # Rank by viral strategy with custom weights
 ./yrank -p PLAYLIST_ID -strategy viral -weights engagement=0.9,reach=0.05,comments=0.05
 
-# Save results to a file
-./yrank -p PLAYLIST_ID -strategy evergreen -o markdown > results.md
+# Export to CSV (pipe-safe, emojis and special chars handled correctly)
+./yrank -c @TiboInShape -o csv -out tiboinshape.csv
+
+# Save results to a file atomically (preferred over shell redirection)
+./yrank -p PLAYLIST_ID -strategy evergreen -o markdown -out results.md
 ```
 
 ## Sample outputs
