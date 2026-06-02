@@ -53,7 +53,8 @@ type Video struct {
 
 // VideoStatistics statistics of a singular playlist
 type VideoStatistics struct {
-	Score                       float64   `header:"Score"`
+	Score                       float64            `header:"Score"`
+	AllScores                   map[string]float64 `header:"-"`
 	Key                         string    `header:"Key"`
 	Title                       string    `header:"Title"`
 	URL                         string    `header:"URL"`

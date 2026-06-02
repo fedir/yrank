@@ -102,9 +102,9 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, out
 			log.Fatalln("Unknown sorting column")
 		}
 	}
-	if *strat != "" {
+	if *strat != "" && *strat != "all" {
 		if _, ok := youtube.Strategies[*strat]; !ok {
-			log.Fatalf("Unknown strategy %q, available: %s", *strat, knownStrategies())
+			log.Fatalf("Unknown strategy %q, available: %s or all", *strat, knownStrategies())
 		}
 	}
 	if *fromDate != "" {

@@ -12,19 +12,19 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func print(vs []youtube.VideoStatistics, of string, showScore bool) {
-	printTo(os.Stdout, vs, of, showScore)
+func print(vs []youtube.VideoStatistics, of string, showScore, allScores bool) {
+	printTo(os.Stdout, vs, of, showScore, allScores)
 }
 
 // printToFile writes output atomically: data goes to a temp file first,
 // then the temp file is renamed to path only on success.
-func printToFile(path string, vs []youtube.VideoStatistics, of string, showScore bool) error {
+func printToFile(path string, vs []youtube.VideoStatistics, of string, showScore, allScores bool) error {
 	tmp := path + ".tmp"
 	f, err := os.Create(tmp)
 	if err != nil {
 		return err
 	}
-	printTo(f, vs, of, showScore)
+	printTo(f, vs, of, showScore, allScores)
 	if err := f.Close(); err != nil {
 		os.Remove(tmp)
 		return err
@@ -37,8 +37,8 @@ func mdSafe(s string) string {
 	return strings.ReplaceAll(s, "|", `\|`)
 }
 
-func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore bool) {
-	headers := []string{
+func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore, allScores bool) {
+	baseHeaders := []string{
 		"Title",
 		"URL",
 		"Published at",
@@ -52,8 +52,18 @@ func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore b
 		"Total reaction",
 		"Global buzz index",
 	}
-	if showScore {
-		headers = append([]string{"Score"}, headers...)
+	var headers []string
+	switch {
+	case allScores:
+		scoreHeaders := make([]string, len(youtube.StrategyOrder))
+		for i, slug := range youtube.StrategyOrder {
+			scoreHeaders[i] = "Score:" + slug
+		}
+		headers = append(scoreHeaders, baseHeaders...)
+	case showScore:
+		headers = append([]string{"Score"}, baseHeaders...)
+	default:
+		headers = baseHeaders
 	}
 
 	if of == "csv" {
@@ -63,23 +73,7 @@ func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore b
 			if vsi.Title == "" {
 				continue
 			}
-			row := []string{
-				vsi.Title,
-				vsi.URL,
-				vsi.PublishedAt.Format("2006-01-02 15:04:05"),
-				fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
-				fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
-				fmt.Sprintf("%.4f", vsi.TotalInterestingness),
-				strconv.Itoa(vsi.ViewCount),
-				strconv.Itoa(vsi.LikeCount),
-				strconv.Itoa(vsi.DislikeCount),
-				strconv.Itoa(vsi.CommentCount),
-				strconv.Itoa(vsi.TotalReaction),
-				strconv.Itoa(vsi.GlobalBuzzIndex),
-			}
-			if showScore {
-				row = append([]string{fmt.Sprintf("%.6f", vsi.Score)}, row...)
-			}
+			row := buildRow(vsi, of, showScore, allScores)
 			_ = w.Write(row)
 		}
 		w.Flush()
@@ -106,28 +100,40 @@ func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore b
 		if vsi.Title == "" {
 			continue
 		}
-		title := vsi.Title
-		if of == "markdown" {
-			title = mdSafe(title)
-		}
-		row := []string{
-			title,
-			vsi.URL,
-			vsi.PublishedAt.Format("2006-01-02 15:04:05"),
-			fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
-			fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
-			fmt.Sprintf("%.4f", vsi.TotalInterestingness),
-			strconv.Itoa(vsi.ViewCount),
-			strconv.Itoa(vsi.LikeCount),
-			strconv.Itoa(vsi.DislikeCount),
-			strconv.Itoa(vsi.CommentCount),
-			strconv.Itoa(vsi.TotalReaction),
-			strconv.Itoa(vsi.GlobalBuzzIndex),
-		}
-		if showScore {
-			row = append([]string{fmt.Sprintf("%.6f", vsi.Score)}, row...)
-		}
-		table.Append(row)
+		table.Append(buildRow(vsi, of, showScore, allScores))
 	}
 	table.Render()
+}
+
+func buildRow(vsi youtube.VideoStatistics, of string, showScore, allScores bool) []string {
+	title := vsi.Title
+	if of == "markdown" {
+		title = mdSafe(title)
+	}
+	base := []string{
+		title,
+		vsi.URL,
+		vsi.PublishedAt.Format("2006-01-02 15:04:05"),
+		fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
+		fmt.Sprintf("%.4f", vsi.PositiveNegativeCoefficient),
+		fmt.Sprintf("%.4f", vsi.TotalInterestingness),
+		strconv.Itoa(vsi.ViewCount),
+		strconv.Itoa(vsi.LikeCount),
+		strconv.Itoa(vsi.DislikeCount),
+		strconv.Itoa(vsi.CommentCount),
+		strconv.Itoa(vsi.TotalReaction),
+		strconv.Itoa(vsi.GlobalBuzzIndex),
+	}
+	switch {
+	case allScores:
+		scores := make([]string, len(youtube.StrategyOrder))
+		for i, slug := range youtube.StrategyOrder {
+			scores[i] = fmt.Sprintf("%.6f", vsi.AllScores[slug])
+		}
+		return append(scores, base...)
+	case showScore:
+		return append([]string{fmt.Sprintf("%.6f", vsi.Score)}, base...)
+	default:
+		return base
+	}
 }

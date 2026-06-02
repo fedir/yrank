@@ -176,7 +176,7 @@ func sampleVideos() []youtube.VideoStatistics {
 
 func TestPrintTo_CSV_headers(t *testing.T) {
 	var buf bytes.Buffer
-	printTo(&buf, sampleVideos(), "csv", false)
+	printTo(&buf, sampleVideos(), "csv", false, false)
 
 	r := csv.NewReader(strings.NewReader(buf.String()))
 	records, err := r.ReadAll()
@@ -198,7 +198,7 @@ func TestPrintTo_CSV_headers(t *testing.T) {
 
 func TestPrintTo_CSV_row_count(t *testing.T) {
 	var buf bytes.Buffer
-	printTo(&buf, sampleVideos(), "csv", false)
+	printTo(&buf, sampleVideos(), "csv", false, false)
 
 	r := csv.NewReader(strings.NewReader(buf.String()))
 	records, _ := r.ReadAll()
@@ -210,7 +210,7 @@ func TestPrintTo_CSV_row_count(t *testing.T) {
 
 func TestPrintTo_CSV_values(t *testing.T) {
 	var buf bytes.Buffer
-	printTo(&buf, sampleVideos(), "csv", false)
+	printTo(&buf, sampleVideos(), "csv", false, false)
 
 	r := csv.NewReader(strings.NewReader(buf.String()))
 	records, _ := r.ReadAll()
@@ -231,7 +231,7 @@ func TestPrintToFile_atomic(t *testing.T) {
 	path := dir + "/out.csv"
 	tmp := path + ".tmp"
 
-	if err := printToFile(path, sampleVideos(), "csv", false); err != nil {
+	if err := printToFile(path, sampleVideos(), "csv", false, false); err != nil {
 		t.Fatalf("printToFile: %v", err)
 	}
 	// final file must exist
@@ -264,7 +264,7 @@ func TestPrintTo_CSV_specialChars(t *testing.T) {
 		{Title: "Emoji 😱🎯", URL: "https://youtu.be/e", PublishedAt: pub},
 	}
 	var buf bytes.Buffer
-	printTo(&buf, videos, "csv", false)
+	printTo(&buf, videos, "csv", false, false)
 
 	r := csv.NewReader(strings.NewReader(buf.String()))
 	records, err := r.ReadAll()
@@ -310,7 +310,7 @@ func TestPrintTo_Markdown_pipeInTitle(t *testing.T) {
 		{Title: "Istio Day: Zero-Downtime | Migration", URL: "https://youtu.be/x", PublishedAt: pub},
 	}
 	var buf bytes.Buffer
-	printTo(&buf, videos, "markdown", false)
+	printTo(&buf, videos, "markdown", false, false)
 
 	out := buf.String()
 	if strings.Contains(out, "Zero-Downtime | Migration") {
@@ -325,7 +325,7 @@ func TestPrintTo_CSV_withScore(t *testing.T) {
 	vs := sampleVideos()
 	vs[0].Score = 0.987654
 	var buf bytes.Buffer
-	printTo(&buf, vs, "csv", true)
+	printTo(&buf, vs, "csv", true, false)
 
 	r := csv.NewReader(strings.NewReader(buf.String()))
 	records, _ := r.ReadAll()
@@ -334,5 +334,65 @@ func TestPrintTo_CSV_withScore(t *testing.T) {
 	}
 	if records[1][0] != "0.987654" {
 		t.Errorf("Score value: got %q want %q", records[1][0], "0.987654")
+	}
+}
+
+// --- -strategy all ---
+
+func TestApplyAllStrategies_columns(t *testing.T) {
+	pub, _ := time.Parse("2006-01-02", "2023-06-01")
+	vs := []youtube.VideoStatistics{
+		{Title: "A", ViewCount: 1000, LikeCount: 50, CommentCount: 10, TotalReaction: 60, TotalInterestingness: 0.06, PublishedAt: pub},
+		{Title: "B", ViewCount: 500, LikeCount: 10, CommentCount: 2, TotalReaction: 12, TotalInterestingness: 0.02, PublishedAt: pub},
+	}
+	youtube.ApplyAllStrategies(vs)
+
+	for _, v := range vs {
+		if v.AllScores == nil {
+			t.Fatalf("AllScores is nil for %q", v.Title)
+		}
+		for _, slug := range youtube.StrategyOrder {
+			if _, ok := v.AllScores[slug]; !ok {
+				t.Errorf("missing strategy score %q for video %q", slug, v.Title)
+			}
+		}
+	}
+}
+
+func TestPrintTo_CSV_allScores_headers(t *testing.T) {
+	pub, _ := time.Parse("2006-01-02", "2023-06-01")
+	vs := []youtube.VideoStatistics{
+		{Title: "A", ViewCount: 1000, LikeCount: 50, CommentCount: 10, TotalReaction: 60, TotalInterestingness: 0.06, PublishedAt: pub},
+	}
+	youtube.ApplyAllStrategies(vs)
+
+	var buf bytes.Buffer
+	printTo(&buf, vs, "csv", false, true)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, err := r.ReadAll()
+	if err != nil {
+		t.Fatalf("invalid CSV: %v", err)
+	}
+	// first N headers should be Score:<slug> in StrategyOrder
+	for i, slug := range youtube.StrategyOrder {
+		want := "Score:" + slug
+		if records[0][i] != want {
+			t.Errorf("header[%d]: got %q want %q", i, records[0][i], want)
+		}
+	}
+	// total columns = 6 strategy scores + 12 base
+	wantCols := len(youtube.StrategyOrder) + 12
+	if len(records[0]) != wantCols {
+		t.Errorf("expected %d columns, got %d", wantCols, len(records[0]))
+	}
+}
+
+func TestStrategyFlag_all(t *testing.T) {
+	resetFlags()
+	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "all"}
+	_, _, _, _, strategy, _, _, _, _, _ := cliParameters()
+	if strategy != "all" {
+		t.Errorf("expected strategy=all, got %q", strategy)
 	}
 }

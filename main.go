@@ -37,7 +37,10 @@ func main() {
 		rankedVideos = filterFrom(rankedVideos, fromDate)
 	}
 
-	if strategy != "" {
+	allStrategies := strategy == "all"
+	if allStrategies {
+		youtube.ApplyAllStrategies(rankedVideos)
+	} else if strategy != "" {
 		env := envWeights()
 		cli := parseWeightsFlag(weightsRaw)
 		weights := youtube.ResolveWeights(strategy, env, cli)
@@ -50,11 +53,11 @@ func main() {
 		rankedVideos = rankedVideos[:m]
 	}
 	if outFile != "" {
-		if err := printToFile(outFile, rankedVideos, of, strategy != ""); err != nil {
+		if err := printToFile(outFile, rankedVideos, of, strategy != "", allStrategies); err != nil {
 			log.Fatalf("write output: %v", err)
 		}
 	} else {
-		print(rankedVideos, of, strategy != "")
+		print(rankedVideos, of, strategy != "", allStrategies)
 	}
 }
 
