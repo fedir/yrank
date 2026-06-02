@@ -65,18 +65,19 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug bool) {
+func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug, localTest bool) {
 	var (
-		playlistID  = flag.String("p", "", "Youtube playlist ID")
-		channelID   = flag.String("c", "", "Youtube channel ID")
-		out         = flag.String("o", "table", "Output format {table|markdown|csv}")
-		sort        = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
-		strat       = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
-		maxRes      = flag.Int("m", 0, "Max items to return (0 = all)")
-		fromDate    = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
-		weightsFlag = flag.String("weights", "", "Override strategy weights: key=val,key=val")
-		outFlag     = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
-		dbg         = flag.Bool("d", false, "Debug mode")
+		playlistID    = flag.String("p", "", "Youtube playlist ID")
+		channelID     = flag.String("c", "", "Youtube channel ID")
+		out           = flag.String("o", "table", "Output format {table|markdown|csv}")
+		sort          = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
+		strat         = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
+		maxRes        = flag.Int("m", 0, "Max items to return (0 = all)")
+		fromDate      = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
+		weightsFlag   = flag.String("weights", "", "Override strategy weights: key=val,key=val")
+		outFlag       = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
+		localTestFlag = flag.Bool("local-test", false, "Use local testdata/ fixtures instead of live API calls")
+		dbg           = flag.Bool("d", false, "Debug mode")
 	)
 	flag.Parse()
 
@@ -119,7 +120,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, out
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg
+	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg, *localTestFlag
 }
 
 func knownStrategies() string {

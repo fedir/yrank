@@ -58,7 +58,7 @@ func TestFilterFrom(t *testing.T) {
 func TestFromFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-from", "2025-06-01"}
-	_, _, _, _, _, from, _, _, _, _ := cliParameters()
+	_, _, _, _, _, from, _, _, _, _, _ := cliParameters()
 	if from != "2025-06-01" {
 		t.Errorf("expected from=2025-06-01, got %q", from)
 	}
@@ -67,7 +67,7 @@ func TestFromFlag_valid(t *testing.T) {
 func TestFromFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, _, from, _, _, _, _ := cliParameters()
+	_, _, _, _, _, from, _, _, _, _, _ := cliParameters()
 	if from != "" {
 		t.Errorf("expected empty from, got %q", from)
 	}
@@ -78,7 +78,7 @@ func TestFromFlag_empty(t *testing.T) {
 func TestStrategyFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral"}
-	_, _, _, _, strategy, _, _, _, _, _ := cliParameters()
+	_, _, _, _, strategy, _, _, _, _, _, _ := cliParameters()
 	if strategy != "viral" {
 		t.Errorf("expected strategy=viral, got %q", strategy)
 	}
@@ -87,7 +87,7 @@ func TestStrategyFlag_valid(t *testing.T) {
 func TestStrategyFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, sorting, strategy, _, _, _, _, _ := cliParameters()
+	_, _, _, sorting, strategy, _, _, _, _, _, _ := cliParameters()
 	if strategy != "" {
 		t.Errorf("expected empty strategy, got %q", strategy)
 	}
@@ -144,7 +144,7 @@ func TestParseWeightsFlag_empty(t *testing.T) {
 func TestWeightsFlag_roundtrip(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral", "-weights", "engagement=0.9,reach=0.05,comments=0.05"}
-	_, _, _, _, _, _, weightsRaw, _, _, _ := cliParameters()
+	_, _, _, _, _, _, weightsRaw, _, _, _, _ := cliParameters()
 	w := parseWeightsFlag(weightsRaw)
 	if w["engagement"] != 0.9 {
 		t.Errorf("expected engagement=0.9 from CLI, got %f", w["engagement"])
@@ -398,7 +398,7 @@ func TestPrintTo_CSV_allScores_headers(t *testing.T) {
 func TestStrategyFlag_all(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "all"}
-	_, _, _, _, strategy, _, _, _, _, _ := cliParameters()
+	_, _, _, _, strategy, _, _, _, _, _, _ := cliParameters()
 	if strategy != "all" {
 		t.Errorf("expected strategy=all, got %q", strategy)
 	}

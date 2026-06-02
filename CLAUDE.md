@@ -27,6 +27,10 @@ go test -race -run TestName ./youtube/...
 ./yrank -p PLAYLIST_ID
 ./yrank -c CHANNEL_ID -s positive-interest -o markdown -m 10
 ./yrank -c CHANNEL_ID -o csv -out export.csv
+
+# Run with local fixtures (no API quota consumed)
+./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test
+./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test -strategy all -o csv
 ```
 
 ## Configuration
@@ -39,13 +43,29 @@ YOUTUBE_API_KEY=your_key_here
 
 The key must have **YouTube Data API v3** enabled in Google Developers Console. The app also reads `YOUTUBE_API_KEY` from the environment directly (`.env` is loaded automatically via `godotenv`).
 
+## Local test mode
+
+The `-local-test` flag replaces the live HTTP client with a mock that serves pre-recorded JSON fixtures from `testdata/`. This avoids consuming API quota during development and enables deterministic testing.
+
+**Fixture files** (playlist `PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w`, 7 videos):
+- `testdata/playlist_page1.json` — playlist items page 1 (no sensitive data)
+- `testdata/video_stats.json` — video statistics for those 7 video IDs
+
+**Adding new fixtures**: fetch the API response, strip `thumbnails`, `description`, `channelId`, `channelTitle`, `videoOwnerChannelTitle`, `videoOwnerChannelId` from snippet fields, and save to `testdata/`.
+
+**Mock routing** (`youtube/mock_transport.go`):
+- URLs containing `playlistItems` → `testdata/playlist_page<N>.json` (`N` from `pageToken`, default `1`)
+- URLs containing `/videos` → `testdata/video_stats.json`
+
+**In tests**: call `youtube.SetHTTPClient(youtube.NewMockClient("testdata"))` (restored via `defer`). See `youtube/mock_transport_test.go` for examples.
+
 ## Architecture
 
 Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-d` flags
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-local-test`, `-d` flags
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 

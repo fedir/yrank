@@ -1,0 +1,142 @@
+{
+  "etag": "UYjQi_0B91yVnI1vt36mHkn8PdQ",
+  "items": [
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "oqAkuaqC73sGED88tFehD5LO0Ws",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy41NkI0NEY2RDEwNTU3Q0M2",
+      "snippet": {
+        "publishedAt": "2023-02-17T13:16:03Z",
+        "title": "COMMENT AVOIR CONFIANCE EN SOI ?",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "NCU_Sebq6Tw"
+        }
+      },
+      "contentDetails": {
+        "videoId": "NCU_Sebq6Tw",
+        "videoPublishedAt": "2015-12-14T17:01:58Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "s8zB3yqQefvbr1X6pxzQ9T-hGW4",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy4yODlGNEE0NkRGMEEzMEQy",
+      "snippet": {
+        "publishedAt": "2023-02-17T13:19:23Z",
+        "title": "COMMENT VAINCRE LA D\u00c9PRESSION ??",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "K4dEFsIxZoM"
+        }
+      },
+      "contentDetails": {
+        "videoId": "K4dEFsIxZoM",
+        "videoPublishedAt": "2015-11-16T17:36:58Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "ALtO2P4qupgz4yrA-_IjY-YF6AU",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy4wMTcyMDhGQUE4NTIzM0Y5",
+      "snippet": {
+        "publishedAt": "2023-02-17T13:28:15Z",
+        "title": "FITNESS SUMMER MOTIVATION",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "BkPwUa7P4kg"
+        }
+      },
+      "contentDetails": {
+        "videoId": "BkPwUa7P4kg",
+        "videoPublishedAt": "2015-05-31T16:30:55Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "M49dxH9g7PAVhVZEJjBiscgXvp8",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy41MjE1MkI0OTQ2QzJGNzNG",
+      "snippet": {
+        "publishedAt": "2023-02-17T13:37:28Z",
+        "title": "FITNESS COUPLE MOTIVATION 2015",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "WpmapdBqH1g"
+        }
+      },
+      "contentDetails": {
+        "videoId": "WpmapdBqH1g",
+        "videoPublishedAt": "2015-02-24T18:54:05Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "o17JCkf0PSsk6hh-NFoC4-5a4zU",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy4wOTA3OTZBNzVEMTUzOTMy",
+      "snippet": {
+        "publishedAt": "2023-02-17T13:47:27Z",
+        "title": "J'AI LA FLEMME DE FAIRE DU SPORT !! - Comment se motiver ?",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "KB7ht1IJP1c"
+        }
+      },
+      "contentDetails": {
+        "videoId": "KB7ht1IJP1c",
+        "videoPublishedAt": "2014-11-29T16:00:04Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "pT35omYq3oRzdnmPZBJNZpSeUo8",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy4xMkVGQjNCMUM1N0RFNEUx",
+      "snippet": {
+        "publishedAt": "2023-02-17T18:21:05Z",
+        "title": "TRAVAILLE TES CUISSES P***** !!",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 5,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "BS2_-QrNIJY"
+        }
+      },
+      "contentDetails": {
+        "videoId": "BS2_-QrNIJY",
+        "videoPublishedAt": "2014-09-10T08:44:00Z"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "uD1RLH72y1kLlfUhjYFsV9J1hyw",
+      "id": "UExpVmRQb3B6R0JzVjdUZ2pBdzlHSDQzQ2s5UUN4cnc1dy41MzJCQjBCNDIyRkJDN0VD",
+      "snippet": {
+        "publishedAt": "2023-02-17T18:21:52Z",
+        "title": "INTO THE SHAPE - Tibo Inshape",
+        "playlistId": "PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w",
+        "position": 6,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "eA80s0S4jhs"
+        }
+      },
+      "contentDetails": {
+        "videoId": "eA80s0S4jhs",
+        "videoPublishedAt": "2014-09-04T16:34:06Z"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 7,
+    "resultsPerPage": 50
+  }
+}

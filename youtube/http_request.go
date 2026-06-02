@@ -7,15 +7,26 @@ import (
 	"time"
 )
 
-func httpRequest(url string) ([]byte, int, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+// HTTPClient is the interface used for all API calls. Override in tests or
+// local-test mode by calling SetHTTPClient before any fetch.
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
+var httpClient HTTPClient = &http.Client{Timeout: 10 * time.Second}
+
+// SetHTTPClient replaces the package-level client (used by tests and -local-test mode).
+func SetHTTPClient(c HTTPClient) {
+	httpClient = c
+}
+
+func httpRequest(url string) ([]byte, int, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal("cannot prepare HTTP request", err)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		log.Fatal("cannot process HTTP request", err)
 	}

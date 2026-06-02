@@ -11,7 +11,10 @@ import (
 
 func main() {
 	c := configuration()
-	cid, pid, of, sorting, strategy, from, weightsRaw, outFile, m, d := cliParameters()
+	cid, pid, of, sorting, strategy, from, weightsRaw, outFile, m, d, localTest := cliParameters()
+	if localTest {
+		youtube.SetHTTPClient(youtube.NewMockClient("testdata"))
+	}
 	if d {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
