@@ -254,6 +254,73 @@ func TestPrintToFile_atomic(t *testing.T) {
 	}
 }
 
+func TestPrintTo_CSV_specialChars(t *testing.T) {
+	pub, _ := time.Parse("2006-01-02", "2025-01-15")
+	videos := []youtube.VideoStatistics{
+		{Title: `Title with "quotes"`, URL: "https://youtu.be/a", PublishedAt: pub},
+		{Title: "Title with, comma", URL: "https://youtu.be/b", PublishedAt: pub},
+		{Title: "Title with\nnewline", URL: "https://youtu.be/c", PublishedAt: pub},
+		{Title: "Title with | pipe", URL: "https://youtu.be/d", PublishedAt: pub},
+		{Title: "Emoji 😱🎯", URL: "https://youtu.be/e", PublishedAt: pub},
+	}
+	var buf bytes.Buffer
+	printTo(&buf, videos, "csv", false)
+
+	r := csv.NewReader(strings.NewReader(buf.String()))
+	records, err := r.ReadAll()
+	if err != nil {
+		t.Fatalf("CSV with special chars is invalid: %v", err)
+	}
+	// header + 5 data rows
+	if len(records) != 6 {
+		t.Fatalf("expected 6 rows, got %d", len(records))
+	}
+	titles := []string{
+		`Title with "quotes"`,
+		"Title with, comma",
+		"Title with\nnewline",
+		"Title with | pipe",
+		"Emoji 😱🎯",
+	}
+	for i, want := range titles {
+		if got := records[i+1][0]; got != want {
+			t.Errorf("row %d title: got %q want %q", i+1, got, want)
+		}
+	}
+}
+
+func TestMdSafe(t *testing.T) {
+	cases := []struct{ in, want string }{
+		{"no pipes here", "no pipes here"},
+		{"a | b | c", `a \| b \| c`},
+		{"| leading", `\| leading`},
+		{"trailing |", `trailing \|`},
+		{"Istio Day: Zero-Downtime | Migration", `Istio Day: Zero-Downtime \| Migration`},
+	}
+	for _, c := range cases {
+		if got := mdSafe(c.in); got != c.want {
+			t.Errorf("mdSafe(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestPrintTo_Markdown_pipeInTitle(t *testing.T) {
+	pub, _ := time.Parse("2006-01-02", "2025-01-15")
+	videos := []youtube.VideoStatistics{
+		{Title: "Istio Day: Zero-Downtime | Migration", URL: "https://youtu.be/x", PublishedAt: pub},
+	}
+	var buf bytes.Buffer
+	printTo(&buf, videos, "markdown", false)
+
+	out := buf.String()
+	if strings.Contains(out, "Zero-Downtime | Migration") {
+		t.Error("unescaped pipe found in markdown output — table will break")
+	}
+	if !strings.Contains(out, `Zero-Downtime \| Migration`) {
+		t.Error("escaped pipe not found in markdown output")
+	}
+}
+
 func TestPrintTo_CSV_withScore(t *testing.T) {
 	vs := sampleVideos()
 	vs[0].Score = 0.987654

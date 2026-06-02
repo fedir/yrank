@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/fedir/yrank/youtube"
 	"github.com/olekukonko/tablewriter"
@@ -29,6 +30,11 @@ func printToFile(path string, vs []youtube.VideoStatistics, of string, showScore
 		return err
 	}
 	return os.Rename(tmp, path)
+}
+
+// mdSafe escapes pipe characters in a string so they don't break markdown tables.
+func mdSafe(s string) string {
+	return strings.ReplaceAll(s, "|", `\|`)
 }
 
 func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore bool) {
@@ -100,8 +106,12 @@ func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore b
 		if vsi.Title == "" {
 			continue
 		}
+		title := vsi.Title
+		if of == "markdown" {
+			title = mdSafe(title)
+		}
 		row := []string{
-			vsi.Title,
+			title,
 			vsi.URL,
 			vsi.PublishedAt.Format("2006-01-02 15:04:05"),
 			fmt.Sprintf("%.4f", vsi.PositiveInterestingness),
