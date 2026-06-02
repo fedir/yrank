@@ -65,7 +65,7 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw string, maxResults int, debug bool) {
+func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug bool) {
 	var (
 		playlistID  = flag.String("p", "", "Youtube playlist ID")
 		channelID   = flag.String("c", "", "Youtube channel ID")
@@ -75,6 +75,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw stri
 		maxRes      = flag.Int("m", 0, "Max items to return (0 = all)")
 		fromDate    = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
 		weightsFlag = flag.String("weights", "", "Override strategy weights: key=val,key=val")
+		outFlag     = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
 		dbg         = flag.Bool("d", false, "Debug mode")
 	)
 	flag.Parse()
@@ -118,7 +119,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw stri
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *maxRes, *dbg
+	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg
 }
 
 func knownStrategies() string {

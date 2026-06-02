@@ -58,7 +58,7 @@ func TestFilterFrom(t *testing.T) {
 func TestFromFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-from", "2025-06-01"}
-	_, _, _, _, _, from, _, _, _ := cliParameters()
+	_, _, _, _, _, from, _, _, _, _ := cliParameters()
 	if from != "2025-06-01" {
 		t.Errorf("expected from=2025-06-01, got %q", from)
 	}
@@ -67,7 +67,7 @@ func TestFromFlag_valid(t *testing.T) {
 func TestFromFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, _, from, _, _, _ := cliParameters()
+	_, _, _, _, _, from, _, _, _, _ := cliParameters()
 	if from != "" {
 		t.Errorf("expected empty from, got %q", from)
 	}
@@ -78,7 +78,7 @@ func TestFromFlag_empty(t *testing.T) {
 func TestStrategyFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral"}
-	_, _, _, _, strategy, _, _, _, _ := cliParameters()
+	_, _, _, _, strategy, _, _, _, _, _ := cliParameters()
 	if strategy != "viral" {
 		t.Errorf("expected strategy=viral, got %q", strategy)
 	}
@@ -87,7 +87,7 @@ func TestStrategyFlag_valid(t *testing.T) {
 func TestStrategyFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, sorting, strategy, _, _, _, _ := cliParameters()
+	_, _, _, sorting, strategy, _, _, _, _, _ := cliParameters()
 	if strategy != "" {
 		t.Errorf("expected empty strategy, got %q", strategy)
 	}
@@ -144,7 +144,7 @@ func TestParseWeightsFlag_empty(t *testing.T) {
 func TestWeightsFlag_roundtrip(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral", "-weights", "engagement=0.9,reach=0.05,comments=0.05"}
-	_, _, _, _, _, _, weightsRaw, _, _ := cliParameters()
+	_, _, _, _, _, _, weightsRaw, _, _, _ := cliParameters()
 	w := parseWeightsFlag(weightsRaw)
 	if w["engagement"] != 0.9 {
 		t.Errorf("expected engagement=0.9 from CLI, got %f", w["engagement"])
@@ -223,6 +223,34 @@ func TestPrintTo_CSV_values(t *testing.T) {
 	}
 	if row[3] != "0.0512" {
 		t.Errorf("PositiveInterestingness: got %q want %q", row[3], "0.0512")
+	}
+}
+
+func TestPrintToFile_atomic(t *testing.T) {
+	dir := t.TempDir()
+	path := dir + "/out.csv"
+	tmp := path + ".tmp"
+
+	if err := printToFile(path, sampleVideos(), "csv", false); err != nil {
+		t.Fatalf("printToFile: %v", err)
+	}
+	// final file must exist
+	if _, err := os.Stat(path); err != nil {
+		t.Errorf("output file missing: %v", err)
+	}
+	// temp file must be gone
+	if _, err := os.Stat(tmp); err == nil {
+		t.Error("temp file should have been removed after rename")
+	}
+	// content must be valid CSV
+	data, _ := os.ReadFile(path)
+	r := csv.NewReader(strings.NewReader(string(data)))
+	records, err := r.ReadAll()
+	if err != nil {
+		t.Fatalf("invalid CSV in output file: %v", err)
+	}
+	if len(records) != 2 {
+		t.Errorf("expected 2 rows, got %d", len(records))
 	}
 }
 

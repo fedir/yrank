@@ -15,6 +15,22 @@ func print(vs []youtube.VideoStatistics, of string, showScore bool) {
 	printTo(os.Stdout, vs, of, showScore)
 }
 
+// printToFile writes output atomically: data goes to a temp file first,
+// then the temp file is renamed to path only on success.
+func printToFile(path string, vs []youtube.VideoStatistics, of string, showScore bool) error {
+	tmp := path + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return err
+	}
+	printTo(f, vs, of, showScore)
+	if err := f.Close(); err != nil {
+		os.Remove(tmp)
+		return err
+	}
+	return os.Rename(tmp, path)
+}
+
 func printTo(out io.Writer, vs []youtube.VideoStatistics, of string, showScore bool) {
 	headers := []string{
 		"Title",

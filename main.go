@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	c := configuration()
-	cid, pid, of, sorting, strategy, from, weightsRaw, m, d := cliParameters()
+	cid, pid, of, sorting, strategy, from, weightsRaw, outFile, m, d := cliParameters()
 	if d {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
@@ -48,7 +49,13 @@ func main() {
 	if m > 0 && m <= len(rankedVideos) {
 		rankedVideos = rankedVideos[:m]
 	}
-	print(rankedVideos, of, strategy != "")
+	if outFile != "" {
+		if err := printToFile(outFile, rankedVideos, of, strategy != ""); err != nil {
+			log.Fatalf("write output: %v", err)
+		}
+	} else {
+		print(rankedVideos, of, strategy != "")
+	}
 }
 
 func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.VideoStatistics {
