@@ -215,6 +215,16 @@
     gap: 7px;
   }
 
+  /* ── Mini card link wrapper ── */
+  a.mini-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 7px;
+  }
+  a.mini-card-link:hover .mini-card { border-color: #3a3a3a; background: #1c1c1c; }
+  a.mini-card-link:hover .mini-title { color: #fff; }
+
   /* ── Mini card ── */
   .mini-card {
     display: flex;
@@ -228,7 +238,8 @@
     overflow: hidden;
   }
 
-  .mini-card:first-child { background: #181818; border-color: #2a2a2a; }
+  /* #1 card highlight — target the link wrapper's first-child */
+  a.mini-card-link:first-child .mini-card { background: #181818; border-color: #2a2a2a; }
 
   .mini-card::before {
     content: '';
@@ -239,11 +250,11 @@
     opacity: 0;
   }
 
-  .mini-card:first-child::before { opacity: 1; }
+  a.mini-card-link:first-child .mini-card::before { opacity: 1; }
 
-  .col-engagement .mini-card:first-child::before { background: #ff0000; }
-  .col-views      .mini-card:first-child::before { background: #4a9eff; }
-  .col-likes      .mini-card:first-child::before { background: #4caf50; }
+  .col-engagement a.mini-card-link:first-child .mini-card::before { background: #ff0000; }
+  .col-views      a.mini-card-link:first-child .mini-card::before { background: #4a9eff; }
+  .col-likes      a.mini-card-link:first-child .mini-card::before { background: #4caf50; }
 
   .mini-rank {
     font-size: 12px;
@@ -254,9 +265,9 @@
     padding-top: 1px;
   }
 
-  .col-engagement .mini-card:first-child .mini-rank { color: #ff4444; }
-  .col-views      .mini-card:first-child .mini-rank { color: #4a9eff; }
-  .col-likes      .mini-card:first-child .mini-rank { color: #4caf50; }
+  .col-engagement a.mini-card-link:first-child .mini-rank { color: #ff4444; }
+  .col-views      a.mini-card-link:first-child .mini-rank { color: #4a9eff; }
+  .col-likes      a.mini-card-link:first-child .mini-rank { color: #4caf50; }
 
   .mini-info { flex: 1; min-width: 0; }
 
@@ -271,7 +282,7 @@
     overflow: hidden;
   }
 
-  .mini-card:first-child .mini-title { color: #fff; font-weight: 600; }
+  a.mini-card-link:first-child .mini-title { color: #fff; font-weight: 600; }
 
   .mini-stats {
     margin-top: 5px;
@@ -407,7 +418,7 @@
       </div>
       <div class="col-body">
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=lceZtXmIGio" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#1</div>
           <div class="mini-info">
             <div class="mini-title">From Chaos to Control: Managing Apps on Private Cellular Networks — Luis Ariza</div>
@@ -420,9 +431,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
           </div>
           <div class="mini-score">15.9%</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=FLTKUAcuFyc" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#2</div>
           <div class="mini-info">
             <div class="mini-title">Locking Down Ray Serve: How to Secure Your ML Models — Kateryna Hrytsaienko, Valtech</div>
@@ -435,9 +446,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:62%"></div></div></div>
           </div>
           <div class="mini-score">9.9%</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=Go3JMhvAhlc" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#3</div>
           <div class="mini-info">
             <div class="mini-title">To Swap or Not To Swap: Memory Management for AI Workloads — Nic Vermande</div>
@@ -450,9 +461,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:41%"></div></div></div>
           </div>
           <div class="mini-score">6.5%</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=oFdW1yAoaHc" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#4</div>
           <div class="mini-info">
             <div class="mini-title">Smart Routing at Scale: How Spotify's XDS Control Plane Cut 75% — Epstein & Hristova</div>
@@ -465,9 +476,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:40%"></div></div></div>
           </div>
           <div class="mini-score">6.3%</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=Gy2_BwETo3M" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#5</div>
           <div class="mini-info">
             <div class="mini-title">Slinky Expanded: Slurm, Kubernetes, and DRA — Praveen Krishna & Marlow Warnicke</div>
@@ -480,7 +491,7 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:36%"></div></div></div>
           </div>
           <div class="mini-score">5.8%</div>
-        </div>
+        </div></a>
 
       </div>
     </div>
@@ -496,7 +507,7 @@
       </div>
       <div class="col-body">
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=hpwJs1DJAo4" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#1</div>
           <div class="mini-info">
             <div class="mini-title">Day 0 — KubeCon + CloudNativeCon 2026 Highlights from Amsterdam</div>
@@ -508,9 +519,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
           </div>
           <div class="mini-score">4 769</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=zKItfTuhOlI" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#2</div>
           <div class="mini-info">
             <div class="mini-title">Keynote: Welcome + Opening Remarks — Jonathan Bryce & Chris Aniszczyk</div>
@@ -522,9 +533,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:73%"></div></div></div>
           </div>
           <div class="mini-score">3 470</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=3GIFe0HbRSo" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#3</div>
           <div class="mini-info">
             <div class="mini-title">Day 1 — KubeCon + CloudNativeCon 2026 Highlights from Amsterdam</div>
@@ -536,9 +547,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:46%"></div></div></div>
           </div>
           <div class="mini-score">2 172</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=ttGYcUFCok0" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#4</div>
           <div class="mini-info">
             <div class="mini-title">Keynote: The Future of Cloud Native Is… Agentic — Lin Sun, Solo.io</div>
@@ -550,9 +561,9 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:44%"></div></div></div>
           </div>
           <div class="mini-score">2 112</div>
-        </div>
+        </div></a>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=_4JkNbuA2Gg" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#5</div>
           <div class="mini-info">
             <div class="mini-title">Gateway API: Bridging the Gap from Ingress to the Future — Panel</div>
@@ -564,7 +575,7 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:42%"></div></div></div>
           </div>
           <div class="mini-score">1 987</div>
-        </div>
+        </div></a>
 
       </div>
     </div>
@@ -580,7 +591,7 @@
       </div>
       <div class="col-body">
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=fj5UQ0WBmAg" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#1</div>
           <div class="mini-info">
             <div class="mini-title">Demystifying the Kubernetes Network Stack (From Pod to Pod) — Simone Rodigari, Microsoft</div>
@@ -592,7 +603,7 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div></div>
           </div>
           <div class="mini-score">55</div>
-        </div>
+        </div></a>
 
         <div class="mini-card">
           <div class="mini-rank">#2</div>
@@ -636,7 +647,7 @@
           <div class="mini-score">33</div>
         </div>
 
-        <div class="mini-card">
+        <a class="mini-card-link" href="https://www.youtube.com/watch?v=ehKzt_kGEeM" target="_blank" rel="noopener"><div class="mini-card">
           <div class="mini-rank">#5</div>
           <div class="mini-info">
             <div class="mini-title">Retroactive Sampling with OpenTelemetry: Cut 90% Tracing Cost — Khavronenko & Jiekun</div>
@@ -648,7 +659,7 @@
             <div class="mini-bar-wrap"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:53%"></div></div></div>
           </div>
           <div class="mini-score">29</div>
-        </div>
+        </div></a>
 
       </div>
     </div>
