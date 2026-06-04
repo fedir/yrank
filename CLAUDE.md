@@ -72,8 +72,9 @@ Two-layer design:
 **`youtube` package** — all YouTube API logic:
 - `channel.go` / `playlist.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` — paginate the API, collect video IDs, then fan out goroutines via `sync.WaitGroup` + buffered channel to fetch per-video stats concurrently
 - `video_statistics.go`: fetches and computes derived metrics for a single video
-- `sorting.go`: `SortBy()` dispatches sort on any `[]VideoStatistics` field
-- `http_request.go`: shared HTTP helper — returns body bytes directly
+- `sorting.go`: `SortBy()` dispatches sort; `ApplyStrategy()` scores + sorts by one strategy; `ApplyAllStrategies()` scores with all 6 strategies (used by `-strategy all`), stores results in `VideoStatistics.AllScores`
+- `mock_transport.go`: `MockTransport` / `NewMockClient()` / `SetHTTPClient()` — injectable HTTP client for tests and `-local-test` mode
+- `http_request.go`: shared HTTP helper using injectable `httpClient` var
 - `structs.go`: `VideoStatistics`, API response shapes
 
 ## Metrics computed per video
@@ -99,6 +100,8 @@ Two-layer design:
 ## Evaluation strategies
 
 `-strategy` scores and sorts videos by a weighted formula. A `Score` column is prepended to the output.
+
+`-strategy all` runs all 6 strategies simultaneously — prepends one `Score:<slug>` column per strategy and sorts by `total-interest`. Ideal for CSV export and cross-strategy comparison. `-weights` has no effect in `all` mode (default weights are used per strategy).
 
 | Slug | Lens | Weight keys |
 |---|---|---|

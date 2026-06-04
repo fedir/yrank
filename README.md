@@ -48,6 +48,7 @@ The key is also read directly from the environment if set there.
 | `-weights` | — | Override strategy weights: `key=val,key=val` |
 | `-from` | — | Only include videos published on or after this date (`YYYY-MM-DD`) |
 | `-m` | `0` (all) | Maximum number of results to return |
+| `-local-test` | `false` | Use local `testdata/` fixtures instead of live API calls (no quota consumed) |
 | `-d` | `false` | Debug mode — prints API URLs and IDs |
 
 ### Sorting (`-s`)
@@ -57,6 +58,8 @@ The key is also read directly from the environment if set there.
 ### Evaluation strategies (`-strategy`)
 
 Each strategy scores videos by a weighted formula over raw signals, then sorts by `Score`. A `Score` column is prepended to the output.
+
+Use `-strategy all` to compute **all 6 strategies at once** — adds one score column per strategy (`Score:viral`, `Score:educational`, …) and sorts by `total-interest`. Ideal for CSV export and cross-strategy comparison.
 
 | Slug | Lens | Weight keys |
 |---|---|---|
@@ -168,6 +171,13 @@ score = views / age_days
 
 # Export to CSV (pipe-safe, emojis and special chars handled correctly)
 ./yrank -c @TiboInShape -o csv -out tiboinshape.csv
+
+# Score with all strategies at once (6 score columns)
+./yrank -p PLAYLIST_ID -strategy all -o csv -out all_strategies.csv
+
+# Use local fixtures — no API quota consumed
+./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test
+./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test -strategy all -o csv
 
 # Save results to a file atomically (preferred over shell redirection)
 ./yrank -p PLAYLIST_ID -strategy evergreen -o markdown -out results.md
