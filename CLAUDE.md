@@ -15,10 +15,11 @@ refactor: extract pagination logic
 ## Commands
 
 ```bash
-make build    # compile → ./yrank binary
+make build    # compile → ./yrank binary (injects version via -ldflags)
 make test     # go test -race ./...
 make vet      # go vet ./...
-make clean    # remove binary and coverage artifacts
+make clean    # remove binary, coverage artifacts and dist/
+make snapshot # local GoReleaser snapshot (no publish; needs goreleaser)
 
 # Run a single test
 go test -race -run TestName ./youtube/...
@@ -31,7 +32,16 @@ go test -race -run TestName ./youtube/...
 # Run with local fixtures (no API quota consumed)
 ./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test
 ./yrank -p PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w -local-test -strategy all -o csv
+
+# Print version (overridden at build time via -ldflags -X main.version=...)
+./yrank -version
 ```
+
+## CI & releases
+
+- `.github/workflows/ci.yml` — runs `make vet`, `make build`, `make test` and an offline `-local-test` smoke test on every push/PR to `master`.
+- `.github/workflows/release.yml` — on a `v*` tag push, runs GoReleaser (`.goreleaser.yaml`): cross-compiles linux/darwin/windows × amd64/arm64, publishes a GitHub release with checksums + changelog, and updates the `fedir/homebrew-tap` formula (needs the `HOMEBREW_TAP_TOKEN` secret).
+- `main.go` declares `var version = "dev"`; `-version`/`-V` print it. The Makefile and GoReleaser inject the real version through `-ldflags "-X main.version=..."`.
 
 ## Configuration
 

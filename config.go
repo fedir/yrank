@@ -79,8 +79,15 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		outFlag       = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
 		localTestFlag = flag.Bool("local-test", false, "Use local testdata/ fixtures instead of live API calls")
 		dbg           = flag.Bool("d", false, "Debug mode")
+		showVersion   = flag.Bool("version", false, "Print version and exit")
+		showVersionV  = flag.Bool("V", false, "Print version and exit (alias of -version)")
 	)
 	flag.Parse()
+
+	if *showVersion || *showVersionV {
+		fmt.Printf("yrank %s\n", version)
+		os.Exit(0)
+	}
 
 	sources := 0
 	for _, s := range []string{*playlistID, *channelID, *searchFlag} {
