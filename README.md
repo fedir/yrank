@@ -1,13 +1,22 @@
 # yrank = Youtube Rank analyzer
 
-[![Build Status](https://travis-ci.org/fedir/yrank.svg?branch=master)](https://travis-ci.org/fedir/yrank)
+[![CI](https://github.com/fedir/yrank/actions/workflows/ci.yml/badge.svg)](https://github.com/fedir/yrank/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/fedir/yrank/branch/master/graph/badge.svg)](https://codecov.io/gh/fedir/yrank)
 
 Ranks videos in a YouTube playlist or channel by engagement metrics, so you can prioritise what to watch — especially useful for large conference playlists.
 
 ## Installation
 
-Go 1.26+ is required.
+Pre-built binaries for Linux, macOS and Windows (amd64/arm64) are attached to every
+[GitHub release](https://github.com/fedir/yrank/releases).
+
+Homebrew:
+
+```bash
+brew install fedir/tap/yrank
+```
+
+With Go 1.26+:
 
 ```bash
 go install github.com/fedir/yrank@latest
@@ -51,6 +60,7 @@ The key is also read directly from the environment if set there.
 | `-m` | `0` (all) | Maximum number of results to return |
 | `-local-test` | `false` | Use local `testdata/` fixtures instead of live API calls (no quota consumed) |
 | `-d` | `false` | Debug mode — prints API URLs and IDs |
+| `-version` / `-V` | — | Print version and exit |
 
 Exactly one input source — `-p`, `-c`, or `-top-search` — must be given; they are mutually exclusive.
 
@@ -198,3 +208,24 @@ score = views / age_days
 * [Squeezie — Concepts originaux](sample_output/squeezie_concepts_originaux_positive_interest.md)
 * [Squeezie — Full channel](sample_output/squeezie_channel_positive_interest.md)
 * [FOSDEM 2020](sample_output/fosdem2020_positive_interest.md)
+
+## Releases
+
+Releases are fully automated with [GoReleaser](https://goreleaser.com/). Pushing a
+`v*` tag triggers the [release workflow](.github/workflows/release.yml), which
+cross-compiles binaries (linux/darwin/windows × amd64/arm64), publishes a GitHub
+release with checksums and a changelog, and updates the Homebrew tap.
+
+```bash
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+Build a local snapshot to test the release config without publishing:
+
+```bash
+make snapshot     # requires goreleaser installed locally
+```
+
+The `Homebrew` formula update requires a `HOMEBREW_TAP_TOKEN` repository secret with
+write access to `fedir/homebrew-tap`.

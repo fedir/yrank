@@ -9,6 +9,9 @@ import (
 	"github.com/fedir/yrank/youtube"
 )
 
+// version is overridden at build time via -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
 	c := configuration()
 	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, d, localTest := cliParameters()
