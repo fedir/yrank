@@ -65,10 +65,11 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug, localTest bool) {
+func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug, localTest bool) {
 	var (
 		playlistID    = flag.String("p", "", "Youtube playlist ID")
 		channelID     = flag.String("c", "", "Youtube channel ID")
+		searchFlag    = flag.String("top-search", "", "Search YouTube for a word/phrase and rank the matching videos")
 		out           = flag.String("o", "table", "Output format {table|markdown|csv}")
 		sort          = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
 		strat         = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
@@ -81,11 +82,17 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, out
 	)
 	flag.Parse()
 
-	if *playlistID == "" && *channelID == "" {
-		log.Fatalln("Playlist ID or channel ID must be defined")
+	sources := 0
+	for _, s := range []string{*playlistID, *channelID, *searchFlag} {
+		if s != "" {
+			sources++
+		}
 	}
-	if *playlistID != "" && *channelID != "" {
-		log.Fatalln("Playlist ID & channel ID cannot be used together")
+	if sources == 0 {
+		log.Fatalln("One of -p (playlist), -c (channel) or -top-search must be defined")
+	}
+	if sources > 1 {
+		log.Fatalln("-p, -c and -top-search are mutually exclusive")
 	}
 	if *out != "table" && *out != "markdown" && *out != "csv" {
 		log.Fatalln("Unknown output format")
@@ -120,7 +127,7 @@ func cliParameters() (cid, pid, output, sorting, strategy, from, weightsRaw, out
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg, *localTestFlag
+	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg, *localTestFlag
 }
 
 func knownStrategies() string {

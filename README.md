@@ -41,6 +41,7 @@ The key is also read directly from the environment if set there.
 |---|---|---|
 | `-p` | — | YouTube playlist ID |
 | `-c` | — | YouTube channel ID or handle (e.g. `@Squeezie`) |
+| `-top-search` | — | Search YouTube for a word/phrase and rank the matching videos |
 | `-o` | `table` | Output format: `table`, `markdown`, or `csv` |
 | `-out` | — | Write output to file atomically (safer than shell redirection for large exports) |
 | `-s` | `total-interest` | Sort by metric (see below). Mutually exclusive with `-strategy` |
@@ -50,6 +51,10 @@ The key is also read directly from the environment if set there.
 | `-m` | `0` (all) | Maximum number of results to return |
 | `-local-test` | `false` | Use local `testdata/` fixtures instead of live API calls (no quota consumed) |
 | `-d` | `false` | Debug mode — prints API URLs and IDs |
+
+Exactly one input source — `-p`, `-c`, or `-top-search` — must be given; they are mutually exclusive.
+
+`-top-search` uses the YouTube `search.list` endpoint, which costs **100 quota units per page** of 50 results (vs 1 unit for playlist/channel listing). It paginates up to `-m` candidates before ranking them; with the default `-m 0` it fetches a single page (≤50 videos).
 
 ### Sorting (`-s`)
 
@@ -159,6 +164,9 @@ score = views / age_days
 
 # Rank a whole channel using a handle
 ./yrank -c @Squeezie -s positive-interest -o markdown
+
+# Search YouTube for a phrase and rank the top 20 matches by viral score
+./yrank -top-search "kubernetes operator" -strategy viral -m 20
 
 # Only videos from 2025 onwards
 ./yrank -c @Squeezie -from 2025-01-01 -s positive-interest
