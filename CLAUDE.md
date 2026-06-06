@@ -50,11 +50,13 @@ The `-local-test` flag replaces the live HTTP client with a mock that serves pre
 **Fixture files** (playlist `PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w`, 7 videos):
 - `testdata/playlist_page1.json` — playlist items page 1 (no sensitive data)
 - `testdata/video_stats.json` — video statistics for those 7 video IDs
+- `testdata/search_results.json` — `search.list` results reusing those 7 video IDs (one title carries an HTML entity to exercise unescaping)
 
 **Adding new fixtures**: fetch the API response, strip `thumbnails`, `description`, `channelId`, `channelTitle`, `videoOwnerChannelTitle`, `videoOwnerChannelId` from snippet fields, and save to `testdata/`.
 
 **Mock routing** (`youtube/mock_transport.go`):
 - URLs containing `playlistItems` → `testdata/playlist_page<N>.json` (`N` from `pageToken`, default `1`)
+- URLs containing `/search` → `testdata/search_results.json`
 - URLs containing `/videos` → `testdata/video_stats.json`
 
 **In tests**: call `youtube.SetHTTPClient(youtube.NewMockClient("testdata"))` (restored via `defer`). See `youtube/mock_transport_test.go` for examples.
@@ -65,12 +67,12 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-local-test`, `-d` flags
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 
 **`youtube` package** — all YouTube API logic:
-- `channel.go` / `playlist.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` — paginate the API, collect video IDs, then fan out goroutines via `sync.WaitGroup` + buffered channel to fetch per-video stats concurrently
+- `channel.go` / `playlist.go` / `search.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` / `SearchStatistics()` — paginate the API, collect video IDs, then fan out goroutines via `sync.WaitGroup` + buffered channel to fetch per-video stats concurrently. `SearchStatistics()` hits the `search.list` endpoint (100 quota units/page), paginates up to `maxResults` (single page when `≤0`), and `html.UnescapeString`s titles
 - `video_statistics.go`: fetches and computes derived metrics for a single video
 - `sorting.go`: `SortBy()` dispatches sort; `ApplyStrategy()` scores + sorts by one strategy; `ApplyAllStrategies()` scores with all 6 strategies (used by `-strategy all`), stores results in `VideoStatistics.AllScores`
 - `mock_transport.go`: `MockTransport` / `NewMockClient()` / `SetHTTPClient()` — injectable HTTP client for tests and `-local-test` mode

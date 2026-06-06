@@ -1,0 +1,101 @@
+{
+  "etag": "mZ9dN1nQpL2vR7sTbWxYcAe0fGh",
+  "nextPageToken": "",
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "aB1cD2eF3gH4iJ5kL6mN7oP8qR9",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "NCU_Sebq6Tw"
+      },
+      "snippet": {
+        "publishedAt": "2015-12-14T17:01:58Z",
+        "title": "COMMENT AVOIR CONFIANCE EN SOI ?",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "bC2dE3fG4hI5jK6lM7nO8pQ9rS0",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "K4dEFsIxZoM"
+      },
+      "snippet": {
+        "publishedAt": "2015-11-16T17:36:58Z",
+        "title": "Motivation &amp; DÉPRESSION",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "cD3eF4gH5iJ6kL7mN8oP9qR0sT1",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "BkPwUa7P4kg"
+      },
+      "snippet": {
+        "publishedAt": "2015-05-31T16:30:55Z",
+        "title": "FITNESS SUMMER MOTIVATION",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "dE4fG5hI6jK7lM8nO9pQ0rS1tU2",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "WpmapdBqH1g"
+      },
+      "snippet": {
+        "publishedAt": "2015-02-24T18:54:05Z",
+        "title": "FITNESS COUPLE MOTIVATION 2015",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "eF5gH6iJ7kL8mN9oP0qR1sT2uV3",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "KB7ht1IJP1c"
+      },
+      "snippet": {
+        "publishedAt": "2014-11-29T16:00:04Z",
+        "title": "J&#39;AI LA FLEMME DE FAIRE DU SPORT !! - Comment se motiver ?",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "fG6hI7jK8lM9nO0pQ1rS2tU3vW4",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "BS2_-QrNIJY"
+      },
+      "snippet": {
+        "publishedAt": "2014-09-10T08:44:00Z",
+        "title": "TRAVAILLE TES CUISSES",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "gH7iJ8kL9mN0oP1qR2sT3uV4wX5",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "eA80s0S4jhs"
+      },
+      "snippet": {
+        "publishedAt": "2014-09-04T16:34:06Z",
+        "title": "INTO THE SHAPE - Tibo Inshape",
+        "liveBroadcastContent": "none"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 7,
+    "resultsPerPage": 50
+  }
+}

@@ -14,6 +14,7 @@ import (
 // MockTransport serves pre-recorded API responses from testdata/ files.
 // URL routing rules:
 //   - playlistItems → testdata/playlist_page<N>.json  (N from pageToken, default 1)
+//   - search        → testdata/search_results.json
 //   - videos        → testdata/video_stats.json
 type MockTransport struct {
 	// DataDir is the directory containing the JSON fixture files.
@@ -52,6 +53,8 @@ func (m *MockTransport) fixtureFor(u *url.URL) string {
 			page = "1"
 		}
 		return filepath.Join(dir, "playlist_page"+page+".json")
+	case strings.Contains(path, "/search"):
+		return filepath.Join(dir, "search_results.json")
 	case strings.Contains(path, "/videos"):
 		return filepath.Join(dir, "video_stats.json")
 	default:

@@ -11,7 +11,7 @@ import (
 
 func main() {
 	c := configuration()
-	cid, pid, of, sorting, strategy, from, weightsRaw, outFile, m, d, localTest := cliParameters()
+	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, d, localTest := cliParameters()
 	if localTest {
 		youtube.SetHTTPClient(youtube.NewMockClient("testdata"))
 	}
@@ -33,6 +33,11 @@ func main() {
 			fmt.Printf("Playlist ID: %s\n", pid)
 		}
 		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
+	} else if topSearch != "" {
+		if d {
+			fmt.Printf("Search query: %s\n", topSearch)
+		}
+		rankedVideos = youtube.SearchStatistics(topSearch, c.apikey, m, d)
 	}
 
 	if from != "" {

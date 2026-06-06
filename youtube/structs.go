@@ -38,6 +38,20 @@ type Playlist struct {
 	} `json:"items"`
 }
 
+// Search is the API response from the search.list endpoint (type=video).
+type Search struct {
+	NextPageToken string `json:"nextPageToken"`
+	Items         []struct {
+		ID struct {
+			VideoID string `json:"videoId"`
+		} `json:"id"`
+		Snippet struct {
+			Title       string `json:"title"`
+			PublishedAt string `json:"publishedAt"`
+		} `json:"snippet"`
+	} `json:"items"`
+}
+
 // Video datastructure for JSON unmarshalling and future ranking
 type Video struct {
 	Items []struct {
