@@ -34,6 +34,14 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 	dislikes, _ := strconv.Atoi(item.Statistics.DislikeCount)
 	comments, _ := strconv.Atoi(item.Statistics.CommentCount)
 
+	if isAnomalousStats(views, likes) {
+		if debug {
+			fmt.Printf("Skipping anomalous video %s: views=%d likes=%d (likely unaired/live stream)\n", vid, views, likes)
+		}
+		dataChan <- VideoStatistics{}
+		return
+	}
+
 	dataChan <- VideoStatistics{
 		Key:                         item.ID,
 		URL:                         "https://www.youtube.com/watch?v=" + item.ID,
@@ -49,6 +57,14 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		TotalInterestingness:        safeDiv(float64(likes+dislikes+comments), float64(views)),
 		GlobalBuzzIndex:             views * (likes + dislikes + comments),
 	}
+}
+
+// isAnomalousStats reports whether a video's stats are physically impossible
+// (e.g. unaired/live-stream placeholders that report ~0 views but carry likes).
+// A like requires a view, so likes > views — or no views at all — means the data
+// is bogus and the video must be dropped to avoid distorting view-normalised metrics.
+func isAnomalousStats(views, likes int) bool {
+	return views <= 0 || likes > views
 }
 
 func safeDiv(a, b float64) float64 {

@@ -1,0 +1,14 @@
+{
+  "etag": "anomalousVideoStatsEtag",
+  "items": [
+    {
+      "id": "wff8strTmAc",
+      "statistics": {
+        "viewCount": "1",
+        "likeCount": "112",
+        "favoriteCount": "0",
+        "commentCount": "0"
+      }
+    }
+  ]
+}

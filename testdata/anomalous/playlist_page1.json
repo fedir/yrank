@@ -1,0 +1,28 @@
+{
+  "etag": "anomalousFixtureEtag",
+  "items": [
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "anomalousItemEtag",
+      "id": "UEFOT01BTE9VU19QTEFZTElTVF9JVEVNX0lE",
+      "snippet": {
+        "publishedAt": "2017-06-18T17:45:04Z",
+        "title": "Live Stream Placeholder",
+        "playlistId": "PLanomalous",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "wff8strTmAc"
+        }
+      },
+      "contentDetails": {
+        "videoId": "wff8strTmAc",
+        "videoPublishedAt": "2017-06-18T17:45:04Z"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 50
+  }
+}
