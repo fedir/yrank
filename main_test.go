@@ -215,19 +215,19 @@ func sampleVideos() []youtube.VideoStatistics {
 	pub, _ := time.Parse("2006-01-02", "2025-01-15")
 	return []youtube.VideoStatistics{
 		{
-			Title:                      "Video One",
-			URL:                        "https://youtu.be/aaa",
-			PublishedAt:                pub,
-			Duration:                   245,
-			PositiveInterestingness:    0.0512,
+			Title:                       "Video One",
+			URL:                         "https://youtu.be/aaa",
+			PublishedAt:                 pub,
+			Duration:                    245,
+			PositiveInterestingness:     0.0512,
 			PositiveNegativeCoefficient: 1234.0,
-			TotalInterestingness:       0.0530,
-			ViewCount:                  10000,
-			LikeCount:                  512,
-			DislikeCount:               0,
-			CommentCount:               100,
-			TotalReaction:              612,
-			GlobalBuzzIndex:            6120000,
+			TotalInterestingness:        0.0530,
+			ViewCount:                   10000,
+			LikeCount:                   512,
+			DislikeCount:                0,
+			CommentCount:                100,
+			TotalReaction:               612,
+			GlobalBuzzIndex:             6120000,
 		},
 		{Title: ""}, // blank title must be skipped
 	}

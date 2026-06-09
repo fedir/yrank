@@ -86,7 +86,7 @@ var Strategies = map[string]Strategy{
 			reactions := float64(v.LikeCount + v.DislikeCount)
 			ratio := float64(v.DislikeCount+1) / float64(v.LikeCount+1)
 			volume := math.Log1p(reactions)
-			return ctx.Weights["ratio"]*ratio * ctx.Weights["volume"]*volume
+			return ctx.Weights["ratio"] * ratio * ctx.Weights["volume"] * volume
 		},
 	},
 

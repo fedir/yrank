@@ -22,26 +22,7 @@ func main() {
 		fmt.Printf("API key: %s\n", c.apikey)
 	}
 
-	var rankedVideos []youtube.VideoStatistics
-	if cid != "" {
-		if strings.HasPrefix(cid, "@") {
-			cid = youtube.ResolveHandle(cid, c.apikey)
-		}
-		if d {
-			fmt.Printf("Channel ID: %s\n", cid)
-		}
-		rankedVideos = youtube.ChannelStatistics(cid, c.apikey, d)
-	} else if pid != "" {
-		if d {
-			fmt.Printf("Playlist ID: %s\n", pid)
-		}
-		rankedVideos = youtube.PlaylistStatistics(pid, c.apikey, "", d)
-	} else if topSearch != "" {
-		if d {
-			fmt.Printf("Search query: %s\n", topSearch)
-		}
-		rankedVideos = youtube.SearchStatistics(topSearch, c.apikey, m, d)
-	}
+	rankedVideos := fetchVideos(c.apikey, cid, pid, topSearch, m, d)
 
 	if from != "" {
 		fromDate, _ := time.Parse("2006-01-02", from)
@@ -71,6 +52,32 @@ func main() {
 	} else {
 		print(rankedVideos, of, strategy != "", allStrategies)
 	}
+}
+
+// fetchVideos resolves the chosen input source (channel, playlist or search)
+// to its ranked video statistics.
+func fetchVideos(apikey, cid, pid, topSearch string, m int, d bool) []youtube.VideoStatistics {
+	switch {
+	case cid != "":
+		if strings.HasPrefix(cid, "@") {
+			cid = youtube.ResolveHandle(cid, apikey)
+		}
+		if d {
+			fmt.Printf("Channel ID: %s\n", cid)
+		}
+		return youtube.ChannelStatistics(cid, apikey, d)
+	case pid != "":
+		if d {
+			fmt.Printf("Playlist ID: %s\n", pid)
+		}
+		return youtube.PlaylistStatistics(pid, apikey, "", d)
+	case topSearch != "":
+		if d {
+			fmt.Printf("Search query: %s\n", topSearch)
+		}
+		return youtube.SearchStatistics(topSearch, apikey, m, d)
+	}
+	return nil
 }
 
 func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.VideoStatistics {

@@ -72,7 +72,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		searchFlag    = flag.String("top-search", "", "Search YouTube for a word/phrase and rank the matching videos")
 		out           = flag.String("o", "table", "Output format {table|markdown|csv}")
 		sort          = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes|duration}")
-		strat         = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
+		strategyFlag  = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
 		maxRes        = flag.Int("m", 0, "Max items to return (0 = all)")
 		minLen        = flag.Int("min-length", 0, "Only include videos at least N seconds long (0 = no min)")
 		maxLen        = flag.Int("max-length", 0, "Only include videos at most N seconds long (0 = no max)")
@@ -91,8 +91,24 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		os.Exit(0)
 	}
 
+	validateSources(*playlistID, *channelID, *searchFlag)
+	validateOutputFormat(*out)
+	validateSortStrategy(*sort, *strategyFlag)
+	validateFilters(*fromDate, *minLen, *maxLen)
+
+	// Default sort when neither -s nor -strategy is given
+	sortVal := *sort
+	if sortVal == "" && *strategyFlag == "" {
+		sortVal = "total-interest"
+	}
+
+	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strategyFlag, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *dbg, *localTestFlag
+}
+
+// validateSources enforces that exactly one input source is given.
+func validateSources(playlistID, channelID, searchFlag string) {
 	sources := 0
-	for _, s := range []string{*playlistID, *channelID, *searchFlag} {
+	for _, s := range []string{playlistID, channelID, searchFlag} {
 		if s != "" {
 			sources++
 		}
@@ -103,46 +119,50 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 	if sources > 1 {
 		log.Fatalln("-p, -c and -top-search are mutually exclusive")
 	}
-	if *out != "table" && *out != "markdown" && *out != "csv" {
+}
+
+// validateOutputFormat rejects unknown -o values.
+func validateOutputFormat(out string) {
+	if out != "table" && out != "markdown" && out != "csv" {
 		log.Fatalln("Unknown output format")
 	}
-	if *sort != "" && *strat != "" {
+}
+
+// validateSortStrategy checks -s/-strategy are not combined and are known.
+func validateSortStrategy(sort, strategy string) {
+	if sort != "" && strategy != "" {
 		log.Fatalln("-s and -strategy cannot be used together")
 	}
-	if *sort != "" {
+	if sort != "" {
 		validSorts := map[string]bool{
 			"likes": true, "total-interest": true, "positive-interest": true,
 			"global-buzz-index": true, "total-reaction": true,
 			"positive-negative-coefficient": true, "pnc": true, "duration": true,
 		}
-		if !validSorts[*sort] {
+		if !validSorts[sort] {
 			log.Fatalln("Unknown sorting column")
 		}
 	}
-	if *strat != "" && *strat != "all" {
-		if _, ok := youtube.Strategies[*strat]; !ok {
-			log.Fatalf("Unknown strategy %q, available: %s or all", *strat, knownStrategies())
+	if strategy != "" && strategy != "all" {
+		if _, ok := youtube.Strategies[strategy]; !ok {
+			log.Fatalf("Unknown strategy %q, available: %s or all", strategy, knownStrategies())
 		}
 	}
-	if *fromDate != "" {
-		if _, err := time.Parse("2006-01-02", *fromDate); err != nil {
+}
+
+// validateFilters checks the -from date and the -min-length/-max-length window.
+func validateFilters(fromDate string, minLen, maxLen int) {
+	if fromDate != "" {
+		if _, err := time.Parse("2006-01-02", fromDate); err != nil {
 			log.Fatalln("Invalid -from date, expected format YYYY-MM-DD")
 		}
 	}
-	if *minLen < 0 || *maxLen < 0 {
+	if minLen < 0 || maxLen < 0 {
 		log.Fatalln("-min-length and -max-length must be non-negative (seconds)")
 	}
-	if *minLen > 0 && *maxLen > 0 && *minLen > *maxLen {
+	if minLen > 0 && maxLen > 0 && minLen > maxLen {
 		log.Fatalln("-min-length cannot be greater than -max-length")
 	}
-
-	// Default sort when neither -s nor -strategy is given
-	sortVal := *sort
-	if sortVal == "" && *strat == "" {
-		sortVal = "total-interest"
-	}
-
-	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *dbg, *localTestFlag
 }
 
 func knownStrategies() string {
