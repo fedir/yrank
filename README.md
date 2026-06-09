@@ -1,7 +1,9 @@
 # yrank = Youtube Rank analyzer
 
 [![CI](https://github.com/fedir/yrank/actions/workflows/ci.yml/badge.svg)](https://github.com/fedir/yrank/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/fedir/yrank/branch/master/graph/badge.svg)](https://codecov.io/gh/fedir/yrank)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fedir/yrank)](https://goreportcard.com/report/github.com/fedir/yrank)
+[![GoDoc](https://godoc.org/github.com/fedir/yrank?status.svg)](https://godoc.org/github.com/fedir/yrank)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Ranks videos in a YouTube playlist or channel by engagement metrics, so you can prioritise what to watch — especially useful for large conference playlists.
 
