@@ -8,6 +8,9 @@
         "likeCount": "43990",
         "favoriteCount": "0",
         "commentCount": "2081"
+      },
+      "contentDetails": {
+        "duration": "PT12M5S"
       }
     },
     {
@@ -17,6 +20,9 @@
         "likeCount": "50439",
         "favoriteCount": "0",
         "commentCount": "1903"
+      },
+      "contentDetails": {
+        "duration": "PT45S"
       }
     },
     {
@@ -26,6 +32,9 @@
         "likeCount": "57835",
         "favoriteCount": "0",
         "commentCount": "1651"
+      },
+      "contentDetails": {
+        "duration": "PT1H2M10S"
       }
     },
     {
@@ -35,6 +44,9 @@
         "likeCount": "81733",
         "favoriteCount": "0",
         "commentCount": "3137"
+      },
+      "contentDetails": {
+        "duration": "PT8M30S"
       }
     },
     {
@@ -44,6 +56,9 @@
         "likeCount": "18594",
         "favoriteCount": "0",
         "commentCount": "924"
+      },
+      "contentDetails": {
+        "duration": "PT30S"
       }
     },
     {
@@ -53,6 +68,9 @@
         "likeCount": "4358",
         "favoriteCount": "0",
         "commentCount": "229"
+      },
+      "contentDetails": {
+        "duration": "PT22M"
       }
     },
     {
@@ -62,6 +80,9 @@
         "likeCount": "13225",
         "favoriteCount": "0",
         "commentCount": "891"
+      },
+      "contentDetails": {
+        "duration": "PT3M15S"
       }
     }
   ]

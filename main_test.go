@@ -53,12 +53,46 @@ func TestFilterFrom(t *testing.T) {
 	}
 }
 
+// --- filterByLength ---
+
+func TestFilterByLength(t *testing.T) {
+	videos := []youtube.VideoStatistics{
+		{Title: "short", Duration: 30},
+		{Title: "mid", Duration: 300},
+		{Title: "long", Duration: 1800},
+		{Title: "unknown", Duration: 0},
+	}
+	tests := []struct {
+		name     string
+		min, max int
+		want     []string
+	}{
+		{"no limits", 0, 0, []string{"short", "mid", "long", "unknown"}},
+		{"min only drops short and unknown", 120, 0, []string{"mid", "long"}},
+		{"max only", 0, 600, []string{"short", "mid", "unknown"}},
+		{"window", 60, 600, []string{"mid"}},
+		{"min keeps boundary", 300, 0, []string{"mid", "long"}},
+	}
+	for _, tc := range tests {
+		got := filterByLength(append([]youtube.VideoStatistics(nil), videos...), tc.min, tc.max)
+		if len(got) != len(tc.want) {
+			t.Errorf("%s: got %d results, want %d", tc.name, len(got), len(tc.want))
+			continue
+		}
+		for i, v := range got {
+			if v.Title != tc.want[i] {
+				t.Errorf("%s [%d]: got %q, want %q", tc.name, i, v.Title, tc.want[i])
+			}
+		}
+	}
+}
+
 // --- -from flag ---
 
 func TestFromFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-from", "2025-06-01"}
-	_, _, _, _, _, _, from, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, from, _, _, _, _, _, _, _ := cliParameters()
 	if from != "2025-06-01" {
 		t.Errorf("expected from=2025-06-01, got %q", from)
 	}
@@ -67,7 +101,7 @@ func TestFromFlag_valid(t *testing.T) {
 func TestFromFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, _, _, from, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, from, _, _, _, _, _, _, _ := cliParameters()
 	if from != "" {
 		t.Errorf("expected empty from, got %q", from)
 	}
@@ -78,7 +112,7 @@ func TestFromFlag_empty(t *testing.T) {
 func TestStrategyFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral"}
-	_, _, _, _, _, strategy, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "viral" {
 		t.Errorf("expected strategy=viral, got %q", strategy)
 	}
@@ -87,7 +121,7 @@ func TestStrategyFlag_valid(t *testing.T) {
 func TestStrategyFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, sorting, strategy, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, sorting, strategy, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "" {
 		t.Errorf("expected empty strategy, got %q", strategy)
 	}
@@ -101,7 +135,7 @@ func TestStrategyFlag_empty(t *testing.T) {
 func TestTopSearchFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-top-search", "kubernetes operator"}
-	_, _, topSearch, _, sorting, _, _, _, _, _, _, _ := cliParameters()
+	_, _, topSearch, _, sorting, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if topSearch != "kubernetes operator" {
 		t.Errorf("expected top-search=%q, got %q", "kubernetes operator", topSearch)
 	}
@@ -114,7 +148,7 @@ func TestTopSearchFlag_valid(t *testing.T) {
 func TestTopSearchFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, topSearch, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, topSearch, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if topSearch != "" {
 		t.Errorf("expected empty top-search, got %q", topSearch)
 	}
@@ -168,7 +202,7 @@ func TestParseWeightsFlag_empty(t *testing.T) {
 func TestWeightsFlag_roundtrip(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral", "-weights", "engagement=0.9,reach=0.05,comments=0.05"}
-	_, _, _, _, _, _, _, weightsRaw, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, _, weightsRaw, _, _, _, _, _, _ := cliParameters()
 	w := parseWeightsFlag(weightsRaw)
 	if w["engagement"] != 0.9 {
 		t.Errorf("expected engagement=0.9 from CLI, got %f", w["engagement"])
@@ -184,6 +218,7 @@ func sampleVideos() []youtube.VideoStatistics {
 			Title:                      "Video One",
 			URL:                        "https://youtu.be/aaa",
 			PublishedAt:                pub,
+			Duration:                   245,
 			PositiveInterestingness:    0.0512,
 			PositiveNegativeCoefficient: 1234.0,
 			TotalInterestingness:       0.0530,
@@ -210,7 +245,7 @@ func TestPrintTo_CSV_headers(t *testing.T) {
 	if len(records) == 0 {
 		t.Fatal("expected at least a header row")
 	}
-	want := []string{"Title", "URL", "Published at", "Positive interestingness",
+	want := []string{"Title", "URL", "Published at", "Duration", "Positive interestingness",
 		"Positive negative coefficient", "Total interestingness",
 		"Views", "Likes", "Dislikes", "Comments", "Total reaction", "Global buzz index"}
 	for i, h := range want {
@@ -242,11 +277,14 @@ func TestPrintTo_CSV_values(t *testing.T) {
 	if row[0] != "Video One" {
 		t.Errorf("Title: got %q want %q", row[0], "Video One")
 	}
-	if row[6] != "10000" {
-		t.Errorf("Views: got %q want %q", row[6], "10000")
+	if row[3] != "245" {
+		t.Errorf("Duration: got %q want %q", row[3], "245")
 	}
-	if row[3] != "0.0512" {
-		t.Errorf("PositiveInterestingness: got %q want %q", row[3], "0.0512")
+	if row[7] != "10000" {
+		t.Errorf("Views: got %q want %q", row[7], "10000")
+	}
+	if row[4] != "0.0512" {
+		t.Errorf("PositiveInterestingness: got %q want %q", row[4], "0.0512")
 	}
 }
 
@@ -412,8 +450,8 @@ func TestPrintTo_CSV_allScores_headers(t *testing.T) {
 			t.Errorf("header[%d]: got %q want %q", 2+i, records[0][2+i], want)
 		}
 	}
-	// total columns = 2 (title+url) + 6 strategy scores + 10 remaining metrics
-	wantCols := 2 + len(youtube.StrategyOrder) + 10
+	// total columns = 2 (title+url) + 6 strategy scores + 11 remaining metrics
+	wantCols := 2 + len(youtube.StrategyOrder) + 11
 	if len(records[0]) != wantCols {
 		t.Errorf("expected %d columns, got %d", wantCols, len(records[0]))
 	}
@@ -422,7 +460,7 @@ func TestPrintTo_CSV_allScores_headers(t *testing.T) {
 func TestStrategyFlag_all(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "all"}
-	_, _, _, _, _, strategy, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "all" {
 		t.Errorf("expected strategy=all, got %q", strategy)
 	}

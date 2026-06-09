@@ -62,6 +62,9 @@ type Video struct {
 			DislikeCount string `json:"dislikeCount"`
 			CommentCount string `json:"commentCount"`
 		} `json:"statistics"`
+		ContentDetails struct {
+			Duration string `json:"duration"`
+		} `json:"contentDetails"`
 	} `json:"items"`
 }
 
@@ -73,6 +76,7 @@ type VideoStatistics struct {
 	Title                       string    `header:"Title"`
 	URL                         string    `header:"URL"`
 	PublishedAt                 time.Time `header:"Published at"`
+	Duration                    int       `header:"Duration"`
 	ViewCount                   int       `header:"View count"`
 	LikeCount                   int       `header:"Like count"`
 	DislikeCount                int       `header:"Dislike count"`

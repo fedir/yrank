@@ -81,6 +81,10 @@ func SortBy(vs []VideoStatistics, sortingColumn string) {
 		sort.Slice(vs[:], func(i, j int) bool {
 			return vs[i].LikeCount > vs[j].LikeCount
 		})
+	case "duration":
+		sort.Slice(vs[:], func(i, j int) bool {
+			return vs[i].Duration > vs[j].Duration
+		})
 	case "total-interest":
 		fallthrough
 	default:

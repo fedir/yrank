@@ -59,10 +59,10 @@ The `-local-test` flag replaces the live HTTP client with a mock that serves pre
 
 **Fixture files** (playlist `PLiVdPopzGBsV7TgjAw9GH43Ck9QCxrw5w`, 7 videos):
 - `testdata/playlist_page1.json` — playlist items page 1 (no sensitive data)
-- `testdata/video_stats.json` — video statistics for those 7 video IDs
+- `testdata/video_stats.json` — `statistics` + `contentDetails.duration` for those 7 video IDs
 - `testdata/search_results.json` — `search.list` results reusing those 7 video IDs (one title carries an HTML entity to exercise unescaping)
 
-**Adding new fixtures**: fetch the API response, strip `thumbnails`, `description`, `channelId`, `channelTitle`, `videoOwnerChannelTitle`, `videoOwnerChannelId` from snippet fields, and save to `testdata/`.
+**Adding new fixtures**: fetch the API response, strip `thumbnails`, `description`, `channelId`, `channelTitle`, `videoOwnerChannelTitle`, `videoOwnerChannelId` from snippet fields, and save to `testdata/`. For `/videos` fixtures keep `contentDetails.duration` so duration parsing/filtering is exercised offline.
 
 **Mock routing** (`youtube/mock_transport.go`):
 - URLs containing `playlistItems` → `testdata/playlist_page<N>.json` (`N` from `pageToken`, default `1`)
@@ -77,13 +77,13 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 
 **`youtube` package** — all YouTube API logic:
 - `channel.go` / `playlist.go` / `search.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` / `SearchStatistics()` — paginate the API, collect video IDs, then fan out goroutines via `sync.WaitGroup` + buffered channel to fetch per-video stats concurrently. `SearchStatistics()` hits the `search.list` endpoint (100 quota units/page), paginates up to `maxResults` (single page when `≤0`), and `html.UnescapeString`s titles
-- `video_statistics.go`: fetches and computes derived metrics for a single video
+- `video_statistics.go`: fetches and computes derived metrics for a single video (requests `part=statistics,contentDetails`; `parseISO8601Duration()` turns the ISO-8601 `contentDetails.duration` into seconds — no extra quota over `statistics` alone)
 - `sorting.go`: `SortBy()` dispatches sort; `ApplyStrategy()` scores + sorts by one strategy; `ApplyAllStrategies()` scores with all 6 strategies (used by `-strategy all`), stores results in `VideoStatistics.AllScores`
 - `mock_transport.go`: `MockTransport` / `NewMockClient()` / `SetHTTPClient()` — injectable HTTP client for tests and `-local-test` mode
 - `http_request.go`: shared HTTP helper using injectable `httpClient` var
@@ -105,9 +105,21 @@ Two-layer design:
 
 `-out FILE` writes output atomically to a file (temp-rename pattern). Prefer over shell redirection for large exports.
 
-`-s` flag values: `likes`, `total-interest` (default), `positive-interest`, `total-reaction`, `global-buzz-index`, `positive-negative-coefficient` (alias: `pnc`)
+`-s` flag values: `likes`, `total-interest` (default), `positive-interest`, `total-reaction`, `global-buzz-index`, `positive-negative-coefficient` (alias: `pnc`), `duration`
 
 `-s` and `-strategy` are mutually exclusive.
+
+## Duration filtering
+
+Every video carries a `Duration` column (seconds), derived from the API's ISO-8601 `contentDetails.duration`.
+
+`-min-length N` / `-max-length N` keep only videos whose duration is within `[N, …]` / `[…, N]` seconds (`0` = no limit on that side). Both are applied (alongside `-from`) before sorting/strategy scoring. Videos with an unknown duration (`0`, e.g. live placeholders) are dropped only when `-min-length` is set.
+
+```bash
+./yrank -c CHANNEL_ID -min-length 60                 # exclude Shorts
+./yrank -c CHANNEL_ID -max-length 600 -s duration    # videos ≤10 min, longest first
+./yrank -c CHANNEL_ID -min-length 120 -max-length 1800
+```
 
 ## Evaluation strategies
 

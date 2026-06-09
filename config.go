@@ -65,15 +65,17 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults int, debug, localTest bool) {
+func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults, minLength, maxLength int, debug, localTest bool) {
 	var (
 		playlistID    = flag.String("p", "", "Youtube playlist ID")
 		channelID     = flag.String("c", "", "Youtube channel ID")
 		searchFlag    = flag.String("top-search", "", "Search YouTube for a word/phrase and rank the matching videos")
 		out           = flag.String("o", "table", "Output format {table|markdown|csv}")
-		sort          = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes}")
+		sort          = flag.String("s", "", "Sorting {total-interest|positive-interest|global-buzz-index|total-reaction|positive-negative-coefficient|pnc|likes|duration}")
 		strat         = flag.String("strategy", "", fmt.Sprintf("Evaluation strategy {%s}", knownStrategies()))
 		maxRes        = flag.Int("m", 0, "Max items to return (0 = all)")
+		minLen        = flag.Int("min-length", 0, "Only include videos at least N seconds long (0 = no min)")
+		maxLen        = flag.Int("max-length", 0, "Only include videos at most N seconds long (0 = no max)")
 		fromDate      = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
 		weightsFlag   = flag.String("weights", "", "Override strategy weights: key=val,key=val")
 		outFlag       = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
@@ -111,7 +113,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		validSorts := map[string]bool{
 			"likes": true, "total-interest": true, "positive-interest": true,
 			"global-buzz-index": true, "total-reaction": true,
-			"positive-negative-coefficient": true, "pnc": true,
+			"positive-negative-coefficient": true, "pnc": true, "duration": true,
 		}
 		if !validSorts[*sort] {
 			log.Fatalln("Unknown sorting column")
@@ -127,6 +129,12 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 			log.Fatalln("Invalid -from date, expected format YYYY-MM-DD")
 		}
 	}
+	if *minLen < 0 || *maxLen < 0 {
+		log.Fatalln("-min-length and -max-length must be non-negative (seconds)")
+	}
+	if *minLen > 0 && *maxLen > 0 && *minLen > *maxLen {
+		log.Fatalln("-min-length cannot be greater than -max-length")
+	}
 
 	// Default sort when neither -s nor -strategy is given
 	sortVal := *sort
@@ -134,7 +142,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *dbg, *localTestFlag
+	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strat, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *dbg, *localTestFlag
 }
 
 func knownStrategies() string {

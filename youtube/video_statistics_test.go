@@ -22,6 +22,31 @@ func Test_fetchVideo(t *testing.T) {
 	if v.Items[0].Statistics.LikeCount != "8" {
 		t.Errorf("unexpected like count: %s", v.Items[0].Statistics.LikeCount)
 	}
+	if v.Items[0].ContentDetails.Duration != "PT4M13S" {
+		t.Errorf("unexpected duration: %s", v.Items[0].ContentDetails.Duration)
+	}
+}
+
+func TestParseISO8601Duration(t *testing.T) {
+	tests := []struct {
+		in   string
+		want int
+	}{
+		{"PT1H2M10S", 3730},
+		{"PT45S", 45},
+		{"PT12M", 720},
+		{"PT8M30S", 510},
+		{"P1DT2H", 93600},
+		{"P0D", 0},
+		{"", 0},
+		{"garbage", 0},
+		{"PT", 0},
+	}
+	for _, tc := range tests {
+		if got := parseISO8601Duration(tc.in); got != tc.want {
+			t.Errorf("parseISO8601Duration(%q) = %d, want %d", tc.in, got, tc.want)
+		}
+	}
 }
 
 func TestIsAnomalousStats(t *testing.T) {

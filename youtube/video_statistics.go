@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"sync"
 	"time"
@@ -12,7 +13,7 @@ import (
 func videoStatistics(vid string, title string, publishedAt string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup, debug bool) {
 	defer wg.Done()
 
-	url := "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=" + vid + "&key=" + apiKey
+	url := "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=" + vid + "&key=" + apiKey
 	if debug {
 		fmt.Printf("Video URL: %s\n", url)
 	}
@@ -47,6 +48,7 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		URL:                         "https://www.youtube.com/watch?v=" + item.ID,
 		Title:                       title,
 		PublishedAt:                 pub,
+		Duration:                    parseISO8601Duration(item.ContentDetails.Duration),
 		ViewCount:                   views,
 		LikeCount:                   likes,
 		DislikeCount:                dislikes,
@@ -65,6 +67,22 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 // is bogus and the video must be dropped to avoid distorting view-normalised metrics.
 func isAnomalousStats(views, likes int) bool {
 	return views <= 0 || likes > views
+}
+
+var iso8601Duration = regexp.MustCompile(`^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$`)
+
+// parseISO8601Duration converts a YouTube ISO-8601 duration ("PT1H2M10S") to
+// seconds. Returns 0 for empty or unparseable values (e.g. live placeholders).
+func parseISO8601Duration(s string) int {
+	m := iso8601Duration.FindStringSubmatch(s)
+	if m == nil {
+		return 0
+	}
+	atoi := func(v string) int {
+		n, _ := strconv.Atoi(v)
+		return n
+	}
+	return atoi(m[1])*86400 + atoi(m[2])*3600 + atoi(m[3])*60 + atoi(m[4])
 }
 
 func safeDiv(a, b float64) float64 {

@@ -57,6 +57,8 @@ The key is also read directly from the environment if set there.
 | `-strategy` | — | Score and rank by evaluation strategy (see below). Mutually exclusive with `-s` |
 | `-weights` | — | Override strategy weights: `key=val,key=val` |
 | `-from` | — | Only include videos published on or after this date (`YYYY-MM-DD`) |
+| `-min-length` | `0` (no min) | Only include videos at least N **seconds** long |
+| `-max-length` | `0` (no max) | Only include videos at most N **seconds** long |
 | `-m` | `0` (all) | Maximum number of results to return |
 | `-local-test` | `false` | Use local `testdata/` fixtures instead of live API calls (no quota consumed) |
 | `-d` | `false` | Debug mode — prints API URLs and IDs |
@@ -68,7 +70,16 @@ Exactly one input source — `-p`, `-c`, or `-top-search` — must be given; the
 
 ### Sorting (`-s`)
 
-`total-interest` (default) · `positive-interest` · `likes` · `total-reaction` · `global-buzz-index` · `positive-negative-coefficient` · `pnc`
+`total-interest` (default) · `positive-interest` · `likes` · `total-reaction` · `global-buzz-index` · `positive-negative-coefficient` · `pnc` · `duration`
+
+### Duration filtering (`-min-length` / `-max-length`)
+
+Every result includes a `Duration` column in **seconds** (from the API's `contentDetails.duration`). `-min-length` / `-max-length` keep only videos within the given second bounds (`0` = no limit on that side); both apply before sorting. Videos with an unknown duration (`0`, e.g. live placeholders) are dropped only when `-min-length` is set.
+
+```bash
+./yrank -c @Vsauce -min-length 300                 # only videos longer than 5 min
+./yrank -c @Vsauce -max-length 60 -s duration      # Shorts-length clips, longest first
+```
 
 ### Evaluation strategies (`-strategy`)
 

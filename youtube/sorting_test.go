@@ -10,15 +10,15 @@ func sampleVideos() []VideoStatistics {
 	return []VideoStatistics{
 		{Title: "a", ViewCount: 1000, LikeCount: 10, DislikeCount: 5, CommentCount: 2,
 			TotalReaction: 17, TotalInterestingness: 0.017, PositiveInterestingness: 0.005,
-			PositiveNegativeCoefficient: 2.0, GlobalBuzzIndex: 17000,
+			PositiveNegativeCoefficient: 2.0, GlobalBuzzIndex: 17000, Duration: 120,
 			PublishedAt: now.Add(-10 * 24 * time.Hour)},
 		{Title: "b", ViewCount: 500, LikeCount: 80, DislikeCount: 1, CommentCount: 50,
 			TotalReaction: 131, TotalInterestingness: 0.262, PositiveInterestingness: 0.158,
-			PositiveNegativeCoefficient: 40.0, GlobalBuzzIndex: 65500,
+			PositiveNegativeCoefficient: 40.0, GlobalBuzzIndex: 65500, Duration: 600,
 			PublishedAt: now.Add(-2 * 24 * time.Hour)},
 		{Title: "c", ViewCount: 2000, LikeCount: 30, DislikeCount: 20, CommentCount: 5,
 			TotalReaction: 55, TotalInterestingness: 0.0275, PositiveInterestingness: 0.005,
-			PositiveNegativeCoefficient: 1.43, GlobalBuzzIndex: 110000,
+			PositiveNegativeCoefficient: 1.43, GlobalBuzzIndex: 110000, Duration: 900,
 			PublishedAt: now.Add(-30 * 24 * time.Hour)},
 	}
 }
@@ -52,6 +52,17 @@ func TestSortBy_likes(t *testing.T) {
 	SortBy(vs, "likes")
 	if vs[0].Title != "b" {
 		t.Errorf("likes: expected b first, got %s", vs[0].Title)
+	}
+}
+
+func TestSortBy_duration(t *testing.T) {
+	vs := sampleVideos()
+	SortBy(vs, "duration")
+	if vs[0].Title != "c" {
+		t.Errorf("duration: expected c first (longest), got %s", vs[0].Title)
+	}
+	if vs[2].Title != "a" {
+		t.Errorf("duration: expected a last (shortest), got %s", vs[2].Title)
 	}
 }
 

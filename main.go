@@ -14,7 +14,7 @@ var version = "dev"
 
 func main() {
 	c := configuration()
-	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, d, localTest := cliParameters()
+	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, d, localTest := cliParameters()
 	if localTest {
 		youtube.SetHTTPClient(youtube.NewMockClient("testdata"))
 	}
@@ -47,6 +47,7 @@ func main() {
 		fromDate, _ := time.Parse("2006-01-02", from)
 		rankedVideos = filterFrom(rankedVideos, fromDate)
 	}
+	rankedVideos = filterByLength(rankedVideos, minLength, maxLength)
 
 	allStrategies := strategy == "all"
 	if allStrategies {
@@ -78,6 +79,26 @@ func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.Vide
 		if !v.PublishedAt.Before(from) {
 			out = append(out, v)
 		}
+	}
+	return out
+}
+
+// filterByLength keeps videos whose duration (seconds) falls within
+// [min, max]. A bound of 0 means "no limit" for that side. Videos with an
+// unknown duration (0, e.g. live placeholders) are dropped only when min > 0.
+func filterByLength(videos []youtube.VideoStatistics, min, max int) []youtube.VideoStatistics {
+	if min <= 0 && max <= 0 {
+		return videos
+	}
+	out := videos[:0]
+	for _, v := range videos {
+		if min > 0 && v.Duration < min {
+			continue
+		}
+		if max > 0 && v.Duration > max {
+			continue
+		}
+		out = append(out, v)
 	}
 	return out
 }
