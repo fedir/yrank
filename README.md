@@ -226,11 +226,25 @@ score = views / age_days
 
 ## Sample outputs
 
-* [KubeCon + CloudNativeCon Europe 2026](sample_output/kubecon_cloudnativecon_europe_2026_positive_interest.md)
+Conferences & playlists:
+
+* [KubeCon + CloudNativeCon Europe 2026](sample_output/kubecon_cloudnativecon_europe_2026_positive_interest.md) · [all strategies (CSV)](sample_output/kubecon_2026_all_strategies.csv)
 * [CNCF Observability Day Europe 2026](sample_output/cncf_observability_day_europe_2026_positive_interest.md)
-* [Squeezie — Concepts originaux](sample_output/squeezie_concepts_originaux_positive_interest.md)
-* [Squeezie — Full channel](sample_output/squeezie_channel_positive_interest.md)
+* [Cloud Native Days France 2026 (CSV)](sample_output/cloud_native_days_france_2026.csv)
+* [GrafanaCon — all strategies (CSV)](sample_output/grafanacon_all_strategies.csv)
 * [FOSDEM 2020](sample_output/fosdem2020_positive_interest.md)
+* [Squeezie — Concepts originaux](sample_output/squeezie_concepts_originaux_positive_interest.md)
+
+Full-channel exports (all strategies, CSV):
+
+* [Squeezie](sample_output/squeezie_channel_positive_interest.md) · [Vsauce](sample_output/vsauce_channel_all.csv) · [HugoDécrypte Actus](sample_output/hugodecrypteactus_channel_all.csv) · [Mister V](sample_output/mister_v_channel_all.csv) · [Tibo InShape](sample_output/tiboinshape_full.csv)
+* [Airbus Defence and Space](sample_output/airbusds_channel_all.csv) · [Naval Group](sample_output/navalgroup_channel_all.csv) · [INA Histoire](sample_output/inahistoire_channel_all.csv)
+
+Filtered exports (duration filters):
+
+* [Vsauce — videos > 300s](sample_output/vsauce_longer_than_300s.csv)
+* [Squeezie — videos > 900s](sample_output/squeezie_longer_than_900s.csv)
+* [Anyme0233 — videos > 300s](sample_output/anyme0233_longer_than_300s.csv)
 
 ## Releases
 
