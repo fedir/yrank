@@ -77,7 +77,7 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-min-views`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 
@@ -119,6 +119,15 @@ Every video carries a `Duration` column (seconds), derived from the API's ISO-86
 ./yrank -c CHANNEL_ID -min-length 60                 # exclude Shorts
 ./yrank -c CHANNEL_ID -max-length 600 -s duration    # videos ≤10 min, longest first
 ./yrank -c CHANNEL_ID -min-length 120 -max-length 1800
+```
+
+## View filtering
+
+`-min-views N` keeps only videos with at least `N` views (`0` = no limit). Applied (alongside `-from` and the duration filters) before sorting/strategy scoring.
+
+```bash
+./yrank -c CHANNEL_ID -min-views 1000000             # only videos past 1M views
+./yrank -c CHANNEL_ID -min-length 300 -min-views 50000
 ```
 
 ## Evaluation strategies

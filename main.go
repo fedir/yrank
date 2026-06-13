@@ -14,7 +14,7 @@ var version = "dev"
 
 func main() {
 	c := configuration()
-	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, d, localTest := cliParameters()
+	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, minViews, d, localTest := cliParameters()
 	if localTest {
 		youtube.SetHTTPClient(youtube.NewMockClient("testdata"))
 	}
@@ -29,6 +29,7 @@ func main() {
 		rankedVideos = filterFrom(rankedVideos, fromDate)
 	}
 	rankedVideos = filterByLength(rankedVideos, minLength, maxLength)
+	rankedVideos = filterByViews(rankedVideos, minViews)
 
 	allStrategies := strategy == "all"
 	if allStrategies {
@@ -78,6 +79,20 @@ func fetchVideos(apikey, cid, pid, topSearch string, m int, d bool) []youtube.Vi
 		return youtube.SearchStatistics(topSearch, apikey, m, d)
 	}
 	return nil
+}
+
+// filterByViews keeps videos with at least min views. A min of 0 is a no-op.
+func filterByViews(videos []youtube.VideoStatistics, min int) []youtube.VideoStatistics {
+	if min <= 0 {
+		return videos
+	}
+	out := videos[:0]
+	for _, v := range videos {
+		if v.ViewCount >= min {
+			out = append(out, v)
+		}
+	}
+	return out
 }
 
 func filterFrom(videos []youtube.VideoStatistics, from time.Time) []youtube.VideoStatistics {

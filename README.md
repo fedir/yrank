@@ -61,6 +61,7 @@ The key is also read directly from the environment if set there.
 | `-from` | — | Only include videos published on or after this date (`YYYY-MM-DD`) |
 | `-min-length` | `0` (no min) | Only include videos at least N **seconds** long |
 | `-max-length` | `0` (no max) | Only include videos at most N **seconds** long |
+| `-min-views` | `0` (no min) | Only include videos with at least N **views** |
 | `-m` | `0` (all) | Maximum number of results to return |
 | `-local-test` | `false` | Use local `testdata/` fixtures instead of live API calls (no quota consumed) |
 | `-d` | `false` | Debug mode — prints API URLs and IDs |
@@ -81,6 +82,15 @@ Every result includes a `Duration` column in **seconds** (from the API's `conten
 ```bash
 ./yrank -c @Vsauce -min-length 300                 # only videos longer than 5 min
 ./yrank -c @Vsauce -max-length 60 -s duration      # Shorts-length clips, longest first
+```
+
+### View filtering (`-min-views`)
+
+`-min-views N` keeps only videos with at least N views (`0` = no limit), applied before sorting alongside the other filters.
+
+```bash
+./yrank -c @Vsauce -min-views 1000000              # only videos past 1M views
+./yrank -c @Vsauce -min-length 300 -min-views 50000
 ```
 
 ### Evaluation strategies (`-strategy`)

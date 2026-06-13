@@ -65,7 +65,7 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults, minLength, maxLength int, debug, localTest bool) {
+func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults, minLength, maxLength, minViewCount int, debug, localTest bool) {
 	var (
 		playlistID    = flag.String("p", "", "Youtube playlist ID")
 		channelID     = flag.String("c", "", "Youtube channel ID")
@@ -76,6 +76,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		maxRes        = flag.Int("m", 0, "Max items to return (0 = all)")
 		minLen        = flag.Int("min-length", 0, "Only include videos at least N seconds long (0 = no min)")
 		maxLen        = flag.Int("max-length", 0, "Only include videos at most N seconds long (0 = no max)")
+		minViews      = flag.Int("min-views", 0, "Only include videos with at least N views (0 = no min)")
 		fromDate      = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
 		weightsFlag   = flag.String("weights", "", "Override strategy weights: key=val,key=val")
 		outFlag       = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
@@ -94,7 +95,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 	validateSources(*playlistID, *channelID, *searchFlag)
 	validateOutputFormat(*out)
 	validateSortStrategy(*sort, *strategyFlag)
-	validateFilters(*fromDate, *minLen, *maxLen)
+	validateFilters(*fromDate, *minLen, *maxLen, *minViews)
 
 	// Default sort when neither -s nor -strategy is given
 	sortVal := *sort
@@ -102,7 +103,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strategyFlag, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *dbg, *localTestFlag
+	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strategyFlag, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *minViews, *dbg, *localTestFlag
 }
 
 // validateSources enforces that exactly one input source is given.
@@ -150,8 +151,9 @@ func validateSortStrategy(sort, strategy string) {
 	}
 }
 
-// validateFilters checks the -from date and the -min-length/-max-length window.
-func validateFilters(fromDate string, minLen, maxLen int) {
+// validateFilters checks the -from date, the -min-length/-max-length window
+// and the -min-views threshold.
+func validateFilters(fromDate string, minLen, maxLen, minViews int) {
 	if fromDate != "" {
 		if _, err := time.Parse("2006-01-02", fromDate); err != nil {
 			log.Fatalln("Invalid -from date, expected format YYYY-MM-DD")
@@ -162,6 +164,9 @@ func validateFilters(fromDate string, minLen, maxLen int) {
 	}
 	if minLen > 0 && maxLen > 0 && minLen > maxLen {
 		log.Fatalln("-min-length cannot be greater than -max-length")
+	}
+	if minViews < 0 {
+		log.Fatalln("-min-views must be non-negative")
 	}
 }
 
