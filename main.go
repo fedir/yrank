@@ -13,7 +13,15 @@ import (
 var version = "dev"
 
 func main() {
-	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, minViews, d, localTest, inFile := cliParameters()
+	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, minViews, d, localTest, inFile, checkFile := cliParameters()
+
+	// -check mode: validate an existing CSV export locally, no API key required.
+	if checkFile != "" {
+		if err := checkCSVFile(checkFile); err != nil {
+			log.Fatalf("check failed: %v", err)
+		}
+		return
+	}
 
 	// -in mode: filter an existing CSV export locally, no API key required.
 	if inFile != "" {

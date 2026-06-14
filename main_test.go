@@ -134,6 +134,45 @@ func TestFilterCSVFile_missingColumns(t *testing.T) {
 	}
 }
 
+// --- checkCSVFile (-check mode) ---
+
+func TestCheckCSVFile(t *testing.T) {
+	dir := t.TempDir()
+	good := dir + "/good.csv"
+	content := "Title,URL,Published at,Duration,Views\n" +
+		"a,u1,2025-01-01,30,100\n" +
+		"b,u2,2025-01-01,1200,200\n"
+	if err := os.WriteFile(good, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := checkCSVFile(good); err != nil {
+		t.Errorf("expected valid CSV to pass, got: %v", err)
+	}
+}
+
+func TestCheckCSVFile_failures(t *testing.T) {
+	dir := t.TempDir()
+	write := func(name, body string) string {
+		p := dir + "/" + name
+		if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}
+	cases := map[string]string{
+		"missing column":     "Title,URL,Duration\na,u,30\n",
+		"no data rows":       "Title,URL,Duration,Views\n",
+		"non-positive views": "Title,URL,Duration,Views\na,u,30,0\n",
+		"empty title":        "Title,URL,Duration,Views\n,u,30,100\n",
+		"uniform views":      "Title,URL,Duration,Views\na,u,30,100\nb,u,40,100\n",
+	}
+	for name, body := range cases {
+		if err := checkCSVFile(write(name+".csv", body)); err == nil {
+			t.Errorf("%s: expected check to fail, got nil", name)
+		}
+	}
+}
+
 // --- filterByViews ---
 
 func TestFilterByViews(t *testing.T) {
@@ -171,7 +210,7 @@ func TestFilterByViews(t *testing.T) {
 func TestFromFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-from", "2025-06-01"}
-	_, _, _, _, _, _, from, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, from, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if from != "2025-06-01" {
 		t.Errorf("expected from=2025-06-01, got %q", from)
 	}
@@ -180,7 +219,7 @@ func TestFromFlag_valid(t *testing.T) {
 func TestFromFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, _, _, from, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, from, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if from != "" {
 		t.Errorf("expected empty from, got %q", from)
 	}
@@ -191,7 +230,7 @@ func TestFromFlag_empty(t *testing.T) {
 func TestLengthViewFlags(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-min-length", "120", "-max-length", "600", "-min-views", "5000"}
-	_, _, _, _, _, _, _, _, _, _, minLen, maxLen, minViews, _, _, _ := cliParameters()
+	_, _, _, _, _, _, _, _, _, _, minLen, maxLen, minViews, _, _, _, _ := cliParameters()
 	if minLen != 120 {
 		t.Errorf("expected min-length=120, got %d", minLen)
 	}
@@ -206,7 +245,7 @@ func TestLengthViewFlags(t *testing.T) {
 func TestLengthViewFlags_defaults(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, _, _, _, _, _, _, minLen, maxLen, minViews, _, _, _ := cliParameters()
+	_, _, _, _, _, _, _, _, _, _, minLen, maxLen, minViews, _, _, _, _ := cliParameters()
 	if minLen != 0 || maxLen != 0 || minViews != 0 {
 		t.Errorf("expected all length/view flags to default to 0, got min-length=%d max-length=%d min-views=%d", minLen, maxLen, minViews)
 	}
@@ -217,7 +256,7 @@ func TestLengthViewFlags_defaults(t *testing.T) {
 func TestStrategyFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral"}
-	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "viral" {
 		t.Errorf("expected strategy=viral, got %q", strategy)
 	}
@@ -226,7 +265,7 @@ func TestStrategyFlag_valid(t *testing.T) {
 func TestStrategyFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, _, _, sorting, strategy, _, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, sorting, strategy, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "" {
 		t.Errorf("expected empty strategy, got %q", strategy)
 	}
@@ -240,7 +279,7 @@ func TestStrategyFlag_empty(t *testing.T) {
 func TestTopSearchFlag_valid(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-top-search", "kubernetes operator"}
-	_, _, topSearch, _, sorting, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, topSearch, _, sorting, _, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if topSearch != "kubernetes operator" {
 		t.Errorf("expected top-search=%q, got %q", "kubernetes operator", topSearch)
 	}
@@ -253,7 +292,7 @@ func TestTopSearchFlag_valid(t *testing.T) {
 func TestTopSearchFlag_empty(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST"}
-	_, _, topSearch, _, _, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, topSearch, _, _, _, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if topSearch != "" {
 		t.Errorf("expected empty top-search, got %q", topSearch)
 	}
@@ -307,7 +346,7 @@ func TestParseWeightsFlag_empty(t *testing.T) {
 func TestWeightsFlag_roundtrip(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "viral", "-weights", "engagement=0.9,reach=0.05,comments=0.05"}
-	_, _, _, _, _, _, _, weightsRaw, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, _, _, weightsRaw, _, _, _, _, _, _, _, _, _ := cliParameters()
 	w := parseWeightsFlag(weightsRaw)
 	if w["engagement"] != 0.9 {
 		t.Errorf("expected engagement=0.9 from CLI, got %f", w["engagement"])
@@ -565,7 +604,7 @@ func TestPrintTo_CSV_allScores_headers(t *testing.T) {
 func TestStrategyFlag_all(t *testing.T) {
 	resetFlags()
 	os.Args = []string{"yrank", "-p", "PLAYLIST", "-strategy", "all"}
-	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _, _, _ := cliParameters()
+	_, _, _, _, _, strategy, _, _, _, _, _, _, _, _, _, _, _ := cliParameters()
 	if strategy != "all" {
 		t.Errorf("expected strategy=all, got %q", strategy)
 	}
