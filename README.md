@@ -76,6 +76,7 @@ The key is also read directly from the environment if set there.
 | `-o` | `table` | Output format: `table`, `markdown`, or `csv` |
 | `-out` | — | Write output to file atomically (safer than shell redirection for large exports) |
 | `-in` | — | Filter an existing CSV export locally (no API): read this file, apply the view/duration filters, write the same format to `-out` |
+| `-check` | — | Validate a yrank CSV export locally (no API) and exit non-zero on failure |
 | `-s` | `total-interest` | Sort by metric (see below). Mutually exclusive with `-strategy` |
 | `-strategy` | — | Score and rank by evaluation strategy (see below). Mutually exclusive with `-s` |
 | `-weights` | — | Override strategy weights: `key=val,key=val` |
@@ -128,6 +129,22 @@ header and writes the same format — works on both base and `-strategy all` exp
 # or via make (IN and OUT required):
 make local-filter IN=sample_output/vsauce_channel_all.csv OUT=vsauce_long.csv MIN_VIEWS=100000 MIN_LENGTH=900
 ```
+
+### Publishing a channel export (`make publish-channel`)
+
+One command to export a full channel, validate it with Go checks (`-check`), and
+`git add`/`commit`/`push` just that CSV with a predefined message:
+
+```bash
+make publish-channel CHANNEL=@NASA
+# → sample_output/nasa_channel_all.csv, validated, committed as
+#   "chore: add @NASA full channel export", then pushed.
+
+make publish-channel CHANNEL=@NASA EXPORT_MSG="chore: refresh NASA export"   # custom message
+```
+
+The commit is gated on the checks: if `-check` finds an empty/short export, a missing
+column, a `views <= 0` row, or uniform per-video stats, the run stops before committing.
 
 ### Evaluation strategies (`-strategy`)
 

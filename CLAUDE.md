@@ -24,6 +24,10 @@ make snapshot # local GoReleaser snapshot (no publish; needs goreleaser)
 # Filter an existing CSV export locally (no API quota); IN and OUT are required
 make local-filter IN=sample_output/foo.csv OUT=foo_filtered.csv MIN_VIEWS=100000 MIN_LENGTH=900
 
+# Export a channel, validate it (Go -check), then git add/commit/push the CSV
+make publish-channel CHANNEL=@NASA                       # commit msg: "chore: add @NASA full channel export"
+make publish-channel CHANNEL=@NASA EXPORT_MSG="chore: refresh NASA"   # override message
+
 # Run a single test
 go test -race -run TestName ./youtube/...
 
@@ -82,6 +86,7 @@ Two-layer design:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
 - `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-in`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-min-views`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required (unless `-in` is used); they are mutually exclusive
 - `filter_csv.go`: `-in FILE` mode — `filterCSVFile()` reads an existing yrank CSV export, locates the `Views`/`Duration` columns by header name, applies `-min-views`/`-min-length`/`-max-length`, and writes the same columns/format to `-out` (atomically) or stdout. No API key required; `main()` handles `-in` before calling `configuration()`. Wrapped by `make local-filter`
+- `check_csv.go`: `-check FILE` mode — `checkCSVFile()` validates a CSV export (required columns, ≥1 data row, no `views<=0`, per-video view variation) and exits non-zero on failure. No API key required; used by `make publish-channel` to gate the commit. The `make publish-channel CHANNEL=@X` target chains export → `-check` → `git add`/`commit`/`push` (commit pattern `EXPORT_MSG`, default `chore: add <CHANNEL> full channel export`)
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 
