@@ -17,15 +17,18 @@ func uploadsPlaylistID(channelID string) string {
 
 // ChannelStatistics returns video statistics for all videos in a channel,
 // including videos not assigned to any manual playlist (via the uploads playlist).
+//
+// Video IDs are deduplicated across all playlists *before* fetching stats, so a
+// video appearing in several playlists costs quota only once.
 func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics {
 	// Always start with the uploads playlist — it contains every uploaded video.
 	uploadsID := uploadsPlaylistID(cid)
 	if debug {
 		fmt.Printf("Uploads playlist: %s\n", uploadsID)
 	}
-	all := PlaylistStatistics(uploadsID, apiKey, "", debug)
+	refs := playlistRefs(uploadsID, apiKey, "", debug)
 
-	// Also fetch manual playlists to pick up any videos that may differ
+	// Also scan manual playlists to pick up any videos that may differ
 	// (rare, but keeps behaviour consistent with prior versions).
 	url := "https://www.googleapis.com/youtube/v3/playlists?channelId=" + cid + "&part=id&maxResults=50&key=" + apiKey
 	if debug {
@@ -36,19 +39,21 @@ func ChannelStatistics(cid string, apiKey string, debug bool) []VideoStatistics 
 		if debug {
 			fmt.Printf("Getting videos from playlist: %s\n", pl.PlaylistID)
 		}
-		all = append(all, PlaylistStatistics(pl.PlaylistID, apiKey, "", debug)...)
+		refs = append(refs, playlistRefs(pl.PlaylistID, apiKey, "", debug)...)
 	}
 
-	// Deduplicate — a video can appear in multiple playlists.
-	seen := make(map[string]bool, len(all))
-	unique := make([]VideoStatistics, 0, len(all))
-	for _, v := range all {
-		if !seen[v.Key] {
-			seen[v.Key] = true
-			unique = append(unique, v)
+	// Deduplicate IDs before the (expensive) stats fetch — a video can appear in
+	// multiple playlists.
+	seen := make(map[string]bool, len(refs))
+	unique := make([]videoRef, 0, len(refs))
+	for _, r := range refs {
+		if !seen[r.ID] {
+			seen[r.ID] = true
+			unique = append(unique, r)
 		}
 	}
-	return unique
+
+	return collectStats(unique, apiKey, debug)
 }
 
 // ResolveHandle resolves a YouTube handle (e.g. "@Squeezie") to a channel ID.

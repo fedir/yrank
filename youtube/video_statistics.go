@@ -6,28 +6,119 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
 
-func videoStatistics(vid string, title string, publishedAt string, apiKey string, dataChan chan VideoStatistics, wg *sync.WaitGroup, debug bool) {
-	defer wg.Done()
+// videoRef is the listing metadata (from playlistItems/search) for one video,
+// carried alongside the ID so it can be re-attached after the batched stats fetch.
+type videoRef struct {
+	ID          string
+	Title       string
+	PublishedAt string
+}
 
-	url := "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=" + vid + "&key=" + apiKey
+// maxIDsPerBatch is the videos.list cap: up to 50 IDs per call, all for 1 quota unit.
+const maxIDsPerBatch = 50
+
+// statsWorkers bounds how many batch requests run concurrently, keeping throughput
+// up while capping burst so we don't trip the per-100s rate limit on large channels.
+const statsWorkers = 6
+
+// collectStats fetches statistics for every ref using batched videos.list calls
+// (≤50 IDs each), then maps each result back to its listing title/publishedAt.
+// Anomalous rows (impossible engagement) are dropped. Order is not preserved; the
+// caller sorts afterwards.
+func collectStats(refs []videoRef, apiKey string, debug bool) []VideoStatistics {
+	chunks := chunkRefs(refs, maxIDsPerBatch)
+	if len(chunks) == 0 {
+		return nil
+	}
+
+	results := make([][]VideoStatistics, len(chunks))
+	jobs := make(chan int)
+	var wg sync.WaitGroup
+
+	workers := statsWorkers
+	if len(chunks) < workers {
+		workers = len(chunks)
+	}
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				results[i] = fetchStatsBatch(chunks[i], apiKey, debug)
+			}
+		}()
+	}
+	for i := range chunks {
+		jobs <- i
+	}
+	close(jobs)
+	wg.Wait()
+
+	var stats []VideoStatistics
+	for _, chunk := range results {
+		stats = append(stats, chunk...)
+	}
+	return stats
+}
+
+// fetchStatsBatch fetches one chunk of refs (≤50) in a single videos.list call.
+func fetchStatsBatch(refs []videoRef, apiKey string, debug bool) []VideoStatistics {
+	byID := make(map[string]videoRef, len(refs))
+	ids := make([]string, 0, len(refs))
+	for _, r := range refs {
+		byID[r.ID] = r
+		ids = append(ids, r.ID)
+	}
+
+	url := "https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=" +
+		strings.Join(ids, ",") + "&key=" + apiKey
 	if debug {
-		fmt.Printf("Video URL: %s\n", url)
+		fmt.Printf("Video URL (%d ids): %s\n", len(ids), url)
 	}
 
 	v := fetchVideo(url)
-	if len(v.Items) == 0 {
-		dataChan <- VideoStatistics{}
-		return
+	stats := make([]VideoStatistics, 0, len(v.Items))
+	for _, item := range v.Items {
+		ref, ok := byID[item.ID]
+		if !ok {
+			continue
+		}
+		vs, keep := buildVideoStatistics(item, ref.Title, ref.PublishedAt, debug)
+		if keep {
+			stats = append(stats, vs)
+		}
 	}
+	return stats
+}
 
-	item := v.Items[0]
+// chunkRefs splits refs into groups of at most size.
+func chunkRefs(refs []videoRef, size int) [][]videoRef {
+	if size <= 0 || len(refs) == 0 {
+		return nil
+	}
+	chunks := make([][]videoRef, 0, (len(refs)+size-1)/size)
+	for i := 0; i < len(refs); i += size {
+		end := i + size
+		if end > len(refs) {
+			end = len(refs)
+		}
+		chunks = append(chunks, refs[i:end])
+	}
+	return chunks
+}
+
+// buildVideoStatistics computes the derived metrics for one video item, attaching
+// the listing title/publishedAt. The bool is false when the row must be dropped
+// (anomalous/impossible engagement).
+func buildVideoStatistics(item VideoItem, title, publishedAt string, debug bool) (VideoStatistics, bool) {
 	pub, err := time.Parse(time.RFC3339, publishedAt)
 	if err != nil {
-		log.Printf("invalid publishedAt %q for video %s: %v", publishedAt, vid, err)
+		log.Printf("invalid publishedAt %q for video %s: %v", publishedAt, item.ID, err)
 	}
 
 	views, _ := strconv.Atoi(item.Statistics.ViewCount)
@@ -37,13 +128,12 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 
 	if isAnomalousStats(views, likes) {
 		if debug {
-			fmt.Printf("Skipping anomalous video %s: views=%d likes=%d (likely unaired/live stream)\n", vid, views, likes)
+			fmt.Printf("Skipping anomalous video %s: views=%d likes=%d (likely unaired/live stream)\n", item.ID, views, likes)
 		}
-		dataChan <- VideoStatistics{}
-		return
+		return VideoStatistics{}, false
 	}
 
-	dataChan <- VideoStatistics{
+	return VideoStatistics{
 		Key:                         item.ID,
 		URL:                         "https://www.youtube.com/watch?v=" + item.ID,
 		Title:                       title,
@@ -58,7 +148,7 @@ func videoStatistics(vid string, title string, publishedAt string, apiKey string
 		PositiveNegativeCoefficient: float64(likes) / float64(1+dislikes),
 		TotalInterestingness:        safeDiv(float64(likes+dislikes+comments), float64(views)),
 		GlobalBuzzIndex:             views * (likes + dislikes + comments),
-	}
+	}, true
 }
 
 // isAnomalousStats reports whether a video's stats are physically impossible

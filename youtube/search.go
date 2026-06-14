@@ -6,7 +6,6 @@ import (
 	"html"
 	"log"
 	"net/url"
-	"sync"
 )
 
 // SearchStatistics searches YouTube for a word or phrase and returns video
@@ -17,7 +16,7 @@ import (
 // maxResults videos (or results run out). With maxResults <= 0 it fetches a
 // single page (up to 50 results). Each page costs 100 YouTube quota units.
 func SearchStatistics(query string, apiKey string, maxResults int, debug bool) []VideoStatistics {
-	var stats []VideoStatistics
+	var refs []videoRef
 	token := ""
 
 	for {
@@ -31,33 +30,25 @@ func SearchStatistics(query string, apiKey string, maxResults int, debug bool) [
 		}
 
 		sr := fetchSearch(reqURL)
-
-		dataChan := make(chan VideoStatistics, len(sr.Items))
-		var wg sync.WaitGroup
-		wg.Add(len(sr.Items))
 		for _, item := range sr.Items {
-			// search.list HTML-escapes titles (&amp;, &#39;), so unescape here.
-			go videoStatistics(item.ID.VideoID, html.UnescapeString(item.Snippet.Title), item.Snippet.PublishedAt, apiKey, dataChan, &wg, debug)
-		}
-		wg.Wait()
-		close(dataChan)
-
-		for vs := range dataChan {
-			if vs.Title != "" {
-				stats = append(stats, vs)
-			}
+			refs = append(refs, videoRef{
+				ID: item.ID.VideoID,
+				// search.list HTML-escapes titles (&amp;, &#39;), so unescape here.
+				Title:       html.UnescapeString(item.Snippet.Title),
+				PublishedAt: item.Snippet.PublishedAt,
+			})
 		}
 
 		if sr.NextPageToken == "" {
 			break
 		}
-		if maxResults <= 0 || len(stats) >= maxResults {
+		if maxResults <= 0 || len(refs) >= maxResults {
 			break
 		}
 		token = sr.NextPageToken
 	}
 
-	return stats
+	return collectStats(refs, apiKey, debug)
 }
 
 func fetchSearch(url string) Search {

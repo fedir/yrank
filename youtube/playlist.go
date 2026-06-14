@@ -4,13 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"sync"
 )
 
-// PlaylistStatistics returns video statistics for every video in a playlist,
-// following pagination iteratively.
+// PlaylistStatistics returns video statistics for every video in a playlist.
 func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, debug bool) []VideoStatistics {
-	var stats []VideoStatistics
+	return collectStats(playlistRefs(playlistKey, apiKey, pageToken, debug), apiKey, debug)
+}
+
+// playlistRefs paginates a playlist's items and returns the listing metadata
+// (id, title, publishedAt) for every video, without fetching any stats.
+func playlistRefs(playlistKey string, apiKey string, pageToken string, debug bool) []videoRef {
+	var refs []videoRef
 	token := pageToken
 
 	for {
@@ -23,20 +27,12 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 		}
 
 		pl := fetchPlaylist(url)
-
-		dataChan := make(chan VideoStatistics, len(pl.Items))
-		var wg sync.WaitGroup
-		wg.Add(len(pl.Items))
 		for _, item := range pl.Items {
-			go videoStatistics(item.ContentDetails.VideoID, item.Snippet.Title, item.ContentDetails.VideoPublishedAt, apiKey, dataChan, &wg, debug)
-		}
-		wg.Wait()
-		close(dataChan)
-
-		for vs := range dataChan {
-			if vs.Title != "" {
-				stats = append(stats, vs)
-			}
+			refs = append(refs, videoRef{
+				ID:          item.ContentDetails.VideoID,
+				Title:       item.Snippet.Title,
+				PublishedAt: item.ContentDetails.VideoPublishedAt,
+			})
 		}
 
 		if pl.NextPageToken == "" {
@@ -45,7 +41,7 @@ func PlaylistStatistics(playlistKey string, apiKey string, pageToken string, deb
 		token = pl.NextPageToken
 	}
 
-	return stats
+	return refs
 }
 
 func fetchPlaylist(url string) Playlist {

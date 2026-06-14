@@ -54,18 +54,21 @@ type Search struct {
 
 // Video datastructure for JSON unmarshalling and future ranking
 type Video struct {
-	Items []struct {
-		ID         string `json:"id"`
-		Statistics struct {
-			ViewCount    string `json:"viewCount"`
-			LikeCount    string `json:"likeCount"`
-			DislikeCount string `json:"dislikeCount"`
-			CommentCount string `json:"commentCount"`
-		} `json:"statistics"`
-		ContentDetails struct {
-			Duration string `json:"duration"`
-		} `json:"contentDetails"`
-	} `json:"items"`
+	Items []VideoItem `json:"items"`
+}
+
+// VideoItem is a single entry of a videos.list response.
+type VideoItem struct {
+	ID         string `json:"id"`
+	Statistics struct {
+		ViewCount    string `json:"viewCount"`
+		LikeCount    string `json:"likeCount"`
+		DislikeCount string `json:"dislikeCount"`
+		CommentCount string `json:"commentCount"`
+	} `json:"statistics"`
+	ContentDetails struct {
+		Duration string `json:"duration"`
+	} `json:"contentDetails"`
 }
 
 // VideoStatistics statistics of a singular playlist
