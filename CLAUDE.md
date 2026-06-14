@@ -82,12 +82,45 @@ Two-layer design:
 - `structs.go`: `Configuration` struct
 
 **`youtube` package** — all YouTube API logic:
-- `channel.go` / `playlist.go` / `search.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` / `SearchStatistics()` — paginate the API, collect video IDs, then fan out goroutines via `sync.WaitGroup` + buffered channel to fetch per-video stats concurrently. `SearchStatistics()` hits the `search.list` endpoint (100 quota units/page), paginates up to `maxResults` (single page when `≤0`), and `html.UnescapeString`s titles
-- `video_statistics.go`: fetches and computes derived metrics for a single video (requests `part=statistics,contentDetails`; `parseISO8601Duration()` turns the ISO-8601 `contentDetails.duration` into seconds — no extra quota over `statistics` alone)
+- `channel.go` / `playlist.go` / `search.go`: entry points `ChannelStatistics()` / `PlaylistStatistics()` / `SearchStatistics()` — paginate the listing endpoint into `[]videoRef` (id + title + publishedAt only, no stats), then hand the refs to `collectStats()`. `SearchStatistics()` hits the `search.list` endpoint (100 quota units/page), paginates up to `maxResults` (single page when `≤0`), and `html.UnescapeString`s titles. `ChannelStatistics()` gathers refs from the uploads playlist + manual playlists and **dedups IDs before** fetching stats, so overlapping videos cost quota only once
+- `video_statistics.go`: `collectStats()` fetches stats in **batched `videos.list` calls of up to 50 IDs each** (`maxIDsPerBatch`), one quota unit per call regardless of ID count — the dominant quota saver (~50× fewer stats calls; also avoids the per-100s rate limit on large channels). A bounded worker pool (`statsWorkers`) runs the batches concurrently. `buildVideoStatistics()` maps each returned item back to its ref by ID and computes derived metrics (`parseISO8601Duration()` turns the ISO-8601 `contentDetails.duration` into seconds; `isAnomalousStats()` drops impossible-engagement rows). Note: the API no longer returns `dislikeCount` (removed by YouTube Dec 2021), so it is always `0`
 - `sorting.go`: `SortBy()` dispatches sort; `ApplyStrategy()` scores + sorts by one strategy; `ApplyAllStrategies()` scores with all 6 strategies (used by `-strategy all`), stores results in `VideoStatistics.AllScores`
 - `mock_transport.go`: `MockTransport` / `NewMockClient()` / `SetHTTPClient()` — injectable HTTP client for tests and `-local-test` mode
 - `http_request.go`: shared HTTP helper using injectable `httpClient` var
 - `structs.go`: `VideoStatistics`, API response shapes
+
+## Quota / token consumption strategy
+
+The YouTube Data API v3 is metered in **quota units** (default **10,000/day**, reset midnight
+US-Pacific), not request count. Keeping consumption low is a core design constraint — respect it
+when changing any fetch path.
+
+**Per-endpoint cost:** `playlistItems.list` = 1 unit/page (≤50 items); `videos.list` = **1 unit
+per call regardless of how many IDs (≤50) or parts**; `channels.list` = 1 unit; `search.list` =
+**100 units/page**.
+
+**Rules the code follows (don't regress these):**
+1. **Batch `videos.list` to ≤50 IDs/call** (`collectStats`/`fetchStatsBatch`, `maxIDsPerBatch`
+   in `youtube/video_statistics.go`). Stats are the dominant cost; batching is ~50× cheaper than
+   one call per video. Never reintroduce a one-ID-per-call fetch.
+2. **Listing collects only `id`/`title`/`publishedAt`** (`playlistRefs`, `search.go`); all other
+   fields come from the batched `videos.list`, joined by ID.
+3. **Dedup IDs before fetching stats** (`channel.go` dedups uploads + manual playlists first).
+4. **Filters stay client-side** (`-min-views`/`-min-length`/`-from` in `main.go`) — the API has
+   no server-side view/duration filter, so they cost nothing extra but cannot reduce fetches.
+
+**Cost rule of thumb:** a channel/playlist of *N* videos ≈ `2 × ceil(N/50)` units. `-top-search`
+adds 100 units per 50 candidates.
+
+**Hard API limits (upstream, not fixable here):**
+- `playlistItems.list` caps a channel's uploads playlist at **~20,000 items** — larger channels
+  (e.g. CCTV = 43,634 videos) can only be partially exported via `-c` (~20,048 retrievable).
+- `search.list` caps at ~500 results/query.
+- `dislikeCount` is no longer returned (removed Dec 2021) → always `0`.
+- No resume yet if quota/rate-limit aborts a run (resumable mode is planned).
+
+Probe remaining quota with a 1-unit call (`videos.list?part=id&id=…`): HTTP 200 = available,
+403 = exhausted/rate-limited. Exact numbers live in the Cloud Console quotas page.
 
 ## Metrics computed per video
 

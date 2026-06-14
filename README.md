@@ -12,19 +12,39 @@ Ranks videos in a YouTube playlist or channel by engagement metrics, so you can 
 Pre-built binaries for Linux, macOS and Windows (amd64/arm64) are attached to every
 [GitHub release](https://github.com/fedir/yrank/releases).
 
-Homebrew:
+### macOS (Homebrew)
 
 ```bash
 brew install fedir/tap/yrank
 ```
 
-With Go 1.26+:
+Recent Homebrew versions require trusting a third-party tap before its formula
+will load. If you see `Refusing to load formula ... from untrusted tap`, run:
+
+```bash
+brew trust fedir/tap
+brew install fedir/tap/yrank
+```
+
+Upgrade to the latest release later with:
+
+```bash
+brew upgrade yrank
+```
+
+Verify the install:
+
+```bash
+yrank -version
+```
+
+### Install with Go (1.26+)
 
 ```bash
 go install github.com/fedir/yrank@latest
 ```
 
-Or build from source:
+### Build from source
 
 ```bash
 git clone https://github.com/fedir/yrank
@@ -70,6 +90,8 @@ The key is also read directly from the environment if set there.
 Exactly one input source — `-p`, `-c`, or `-top-search` — must be given; they are mutually exclusive.
 
 `-top-search` uses the YouTube `search.list` endpoint, which costs **100 quota units per page** of 50 results (vs 1 unit for playlist/channel listing). It paginates up to `-m` candidates before ranking them; with the default `-m 0` it fetches a single page (≤50 videos).
+
+See [Quota & limits](#quota--limits) for the full cost model and the hard caps the YouTube API imposes.
 
 ### Sorting (`-s`)
 
@@ -222,6 +244,66 @@ score = views / age_days
 
 # Save results to a file atomically (preferred over shell redirection)
 ./yrank -p PLAYLIST_ID -strategy evergreen -o markdown -out results.md
+```
+
+## Quota & limits
+
+yrank talks to the **YouTube Data API v3**, which is metered in **quota units** (the API's
+"tokens"), not in number of requests. The default project budget is **10,000 units/day**,
+resetting at **midnight US-Pacific time**. This chapter is the cost model and the strategy yrank
+follows to stay inside it.
+
+### Per-endpoint cost
+
+| Endpoint | Used for | Cost |
+|---|---|---|
+| `playlistItems.list` | listing a playlist / channel uploads (≤50 items/page) | **1 unit/page** |
+| `videos.list` | per-video statistics + duration (**up to 50 IDs/call**) | **1 unit/call** |
+| `channels.list` | resolving `@handle`, listing manual playlists | **1 unit** |
+| `search.list` | `-top-search` (≤50 results/page) | **100 units/page** |
+
+### Strategy we follow to minimise consumption
+
+1. **Batch `videos.list` to 50 IDs per call.** Statistics are the dominant cost, and a call
+   costs 1 unit whether it carries 1 ID or 50. We collect IDs from the listing, then fetch
+   stats in chunks of 50 — roughly a **50× reduction** versus one call per video.
+2. **Listing carries only what's free.** Pagination collects `id` + `title` + `publishedAt`
+   only; everything else (views, likes, comments, duration) comes from the batched
+   `videos.list`, joined back by ID.
+3. **Deduplicate IDs before fetching stats.** For a channel, IDs from the uploads playlist and
+   manual playlists are deduplicated *before* any `videos.list` call, so a video in several
+   playlists is paid for once.
+4. **Filters are client-side and free.** `-min-views` / `-min-length` / `-from` cannot be
+   pushed to the API (it has no such parameters), but they run on already-fetched data, so
+   they add **zero** quota.
+
+**Rule of thumb:** a channel/playlist of *N* videos costs about **`2 × ceil(N/50)`** units
+(listing + stats). Examples: Naval Group (239 videos) ≈ **10 units**; a 20k-video channel
+≈ **~1,200 units**. A `-top-search` run adds **100 units per 50 candidates**.
+
+### Hard limits imposed by the API (not by yrank)
+
+- **~20,000-video cap per channel.** `playlistItems.list` stops paginating a channel's uploads
+  playlist at ~20k items. Channels larger than that **cannot be fully exported** with `-c`
+  (e.g. CCTV Video News Agency has 43,634 videos but only ~20,048 are retrievable this way).
+- **`search.list` caps** at ~500 results per query (pagination limit), at 100 units/page.
+- **No server-side filtering** by view count or precise duration — the data must be fetched
+  before any `-min-views`/`-min-length` filter can apply.
+- **`dislikeCount` is gone.** YouTube removed public dislikes from the API in December 2021, so
+  that field is always `0` and the dislike-based metrics effectively run with `dislikes = 0`.
+- **No resume on interruption (yet).** If the daily quota is exhausted or a rate limit hits
+  mid-run, the run aborts and partial work is lost. A resumable/queued mode is planned.
+
+### Checking your remaining quota
+
+The exact remaining number is only visible in the Google Cloud Console
+(**APIs & Services → YouTube Data API v3 → Quotas**). With just an API key you can *probe*
+whether quota is still available with a 1-unit call:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' \
+  "https://www.googleapis.com/youtube/v3/videos?part=id&id=NCU_Sebq6Tw&key=$YOUTUBE_API_KEY"
+# 200 = quota available · 403 = quota exhausted / rate-limited
 ```
 
 ## Sample outputs
