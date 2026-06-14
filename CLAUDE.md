@@ -21,6 +21,9 @@ make vet      # go vet ./...
 make clean    # remove binary, coverage artifacts and dist/
 make snapshot # local GoReleaser snapshot (no publish; needs goreleaser)
 
+# Filter an existing CSV export locally (no API quota); IN and OUT are required
+make local-filter IN=sample_output/foo.csv OUT=foo_filtered.csv MIN_VIEWS=100000 MIN_LENGTH=900
+
 # Run a single test
 go test -race -run TestName ./youtube/...
 
@@ -77,7 +80,8 @@ Two-layer design:
 
 **Root package (`main`)** — CLI entrypoint + rendering:
 - `main.go`: reads config + CLI flags, calls `youtube` package, sorts, limits, prints
-- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-min-views`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required; they are mutually exclusive
+- `config.go`: loads `.env` via `godotenv`, reads `YOUTUBE_API_KEY`; `cliParameters()` parses `-p`, `-c`, `-top-search`, `-in`, `-s`, `-o`, `-out`, `-m`, `-from`, `-min-length`, `-max-length`, `-min-views`, `-strategy`, `-weights`, `-local-test`, `-d` flags. Exactly one of `-p`/`-c`/`-top-search` is required (unless `-in` is used); they are mutually exclusive
+- `filter_csv.go`: `-in FILE` mode — `filterCSVFile()` reads an existing yrank CSV export, locates the `Views`/`Duration` columns by header name, applies `-min-views`/`-min-length`/`-max-length`, and writes the same columns/format to `-out` (atomically) or stdout. No API key required; `main()` handles `-in` before calling `configuration()`. Wrapped by `make local-filter`
 - `view.go`: `print()` renders results as `table`, `markdown`, or `csv`; `printToFile()` writes atomically via temp-rename; `mdSafe()` escapes `|` in titles for markdown
 - `structs.go`: `Configuration` struct
 

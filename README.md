@@ -75,6 +75,7 @@ The key is also read directly from the environment if set there.
 | `-top-search` | — | Search YouTube for a word/phrase and rank the matching videos |
 | `-o` | `table` | Output format: `table`, `markdown`, or `csv` |
 | `-out` | — | Write output to file atomically (safer than shell redirection for large exports) |
+| `-in` | — | Filter an existing CSV export locally (no API): read this file, apply the view/duration filters, write the same format to `-out` |
 | `-s` | `total-interest` | Sort by metric (see below). Mutually exclusive with `-strategy` |
 | `-strategy` | — | Score and rank by evaluation strategy (see below). Mutually exclusive with `-s` |
 | `-weights` | — | Override strategy weights: `key=val,key=val` |
@@ -113,6 +114,19 @@ Every result includes a `Duration` column in **seconds** (from the API's `conten
 ```bash
 ./yrank -c @Vsauce -min-views 1000000              # only videos past 1M views
 ./yrank -c @Vsauce -min-length 300 -min-views 50000
+```
+
+### Re-filter an existing export locally (`-in`, no API quota)
+
+Already exported a channel and want a tighter cut without spending quota again? Feed an existing
+CSV back in with `-in` (or `make local-filter`). It locates the `Views`/`Duration` columns by
+header and writes the same format — works on both base and `-strategy all` exports.
+
+```bash
+./yrank -in sample_output/vsauce_channel_all.csv -out vsauce_long.csv -min-length 900 -min-views 100000
+
+# or via make (IN and OUT required):
+make local-filter IN=sample_output/vsauce_channel_all.csv OUT=vsauce_long.csv MIN_VIEWS=100000 MIN_LENGTH=900
 ```
 
 ### Evaluation strategies (`-strategy`)
