@@ -65,7 +65,7 @@ func parseWeightsFlag(raw string) youtube.Weights {
 	return w
 }
 
-func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults, minLength, maxLength, minViewCount int, debug, localTest bool) {
+func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weightsRaw, outFile string, maxResults, minLength, maxLength, minViewCount int, debug, localTest bool, inFile string) {
 	var (
 		playlistID    = flag.String("p", "", "Youtube playlist ID")
 		channelID     = flag.String("c", "", "Youtube channel ID")
@@ -80,6 +80,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		fromDate      = flag.String("from", "", "Only include videos published on or after this date (YYYY-MM-DD)")
 		weightsFlag   = flag.String("weights", "", "Override strategy weights: key=val,key=val")
 		outFlag       = flag.String("out", "", "Write output to file atomically (safer than shell redirection)")
+		inFlag        = flag.String("in", "", "Filter an existing CSV export (no API): read this file, apply -min-views/-min-length/-max-length, write same format to -out")
 		localTestFlag = flag.Bool("local-test", false, "Use local testdata/ fixtures instead of live API calls")
 		dbg           = flag.Bool("d", false, "Debug mode")
 		showVersion   = flag.Bool("version", false, "Print version and exit")
@@ -92,7 +93,14 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		os.Exit(0)
 	}
 
-	validateSources(*playlistID, *channelID, *searchFlag)
+	// -in is a local CSV-filtering mode: it replaces the API source entirely.
+	if *inFlag != "" {
+		if *playlistID != "" || *channelID != "" || *searchFlag != "" {
+			log.Fatalln("-in cannot be combined with -p, -c or -top-search")
+		}
+	} else {
+		validateSources(*playlistID, *channelID, *searchFlag)
+	}
 	validateOutputFormat(*out)
 	validateSortStrategy(*sort, *strategyFlag)
 	validateFilters(*fromDate, *minLen, *maxLen, *minViews)
@@ -103,7 +111,7 @@ func cliParameters() (cid, pid, topSearch, output, sorting, strategy, from, weig
 		sortVal = "total-interest"
 	}
 
-	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strategyFlag, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *minViews, *dbg, *localTestFlag
+	return *channelID, *playlistID, *searchFlag, *out, sortVal, *strategyFlag, *fromDate, *weightsFlag, *outFlag, *maxRes, *minLen, *maxLen, *minViews, *dbg, *localTestFlag, *inFlag
 }
 
 // validateSources enforces that exactly one input source is given.

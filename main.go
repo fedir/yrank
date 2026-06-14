@@ -13,8 +13,17 @@ import (
 var version = "dev"
 
 func main() {
+	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, minViews, d, localTest, inFile := cliParameters()
+
+	// -in mode: filter an existing CSV export locally, no API key required.
+	if inFile != "" {
+		if err := filterCSVFile(inFile, outFile, minViews, minLength, maxLength); err != nil {
+			log.Fatalf("filter file: %v", err)
+		}
+		return
+	}
+
 	c := configuration()
-	cid, pid, topSearch, of, sorting, strategy, from, weightsRaw, outFile, m, minLength, maxLength, minViews, d, localTest := cliParameters()
 	if localTest {
 		youtube.SetHTTPClient(youtube.NewMockClient("testdata"))
 	}
