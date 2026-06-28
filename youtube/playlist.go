@@ -17,6 +17,11 @@ func playlistRefs(playlistKey string, apiKey string, pageToken string, debug boo
 	var refs []videoRef
 	token := pageToken
 
+	// Some playlists return a nextPageToken that points back to a page we've
+	// already fetched (a self-referential or cyclic token), which would loop
+	// forever. Track the tokens we've requested and stop if one repeats.
+	seenTokens := map[string]bool{}
+
 	for {
 		url := "https://www.googleapis.com/youtube/v3/playlistItems?playlistId=" + playlistKey + "&maxResults=50&part=snippet%2CcontentDetails&key=" + apiKey
 		if token != "" {
@@ -25,6 +30,7 @@ func playlistRefs(playlistKey string, apiKey string, pageToken string, debug boo
 		if debug {
 			fmt.Printf("Playlist URL: %s\n", url)
 		}
+		seenTokens[token] = true
 
 		pl := fetchPlaylist(url)
 		for _, item := range pl.Items {
@@ -35,7 +41,10 @@ func playlistRefs(playlistKey string, apiKey string, pageToken string, debug boo
 			})
 		}
 
-		if pl.NextPageToken == "" {
+		if pl.NextPageToken == "" || seenTokens[pl.NextPageToken] {
+			if debug && seenTokens[pl.NextPageToken] && pl.NextPageToken != "" {
+				fmt.Printf("Stopping pagination for %s: nextPageToken %q repeats (non-advancing)\n", playlistKey, pl.NextPageToken)
+			}
 			break
 		}
 		token = pl.NextPageToken
