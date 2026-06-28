@@ -352,12 +352,15 @@ Full-channel exports (all strategies, CSV):
 
 * [Squeezie](sample_output/squeezie_channel_positive_interest.md) · [Vsauce](sample_output/vsauce_channel_all.csv) · [HugoDécrypte Actus](sample_output/hugodecrypteactus_channel_all.csv) · [Mister V](sample_output/mister_v_channel_all.csv) · [Tibo InShape](sample_output/tiboinshape_full.csv)
 * [Airbus Defence and Space](sample_output/airbusds_channel_all.csv) · [Naval Group](sample_output/navalgroup_channel_all.csv) · [INA Histoire](sample_output/inahistoire_channel_all.csv)
+* [NASA](sample_output/nasa_channel_all.csv) · [Saturday Night Live](sample_output/saturdaynightlive_channel_all.csv) · [CCTV Video News Agency](sample_output/cctvvideonewsagency_channel_all.csv) (43k-video channel — ~20k retrievable, see the [uploads-playlist cap](#hard-limits-imposed-by-the-api-not-by-yrank))
+* [Immersion Documentaires](sample_output/immersion_documentaires_channel_all.csv)
 
-Filtered exports (duration filters):
+Filtered exports:
 
 * [Vsauce — videos > 300s](sample_output/vsauce_longer_than_300s.csv)
 * [Squeezie — videos > 900s](sample_output/squeezie_longer_than_900s.csv)
 * [Anyme0233 — videos > 300s](sample_output/anyme0233_longer_than_300s.csv)
+* [CCTV — ≥10k views & ≥5 min](sample_output/cctvvideonewsagency_channel_10000v_300s.csv) · [CCTV — ≥100k views & ≥15 min](sample_output/cctvvideonewsagency_channel_100000v_900s.csv) (produced locally with `-in`, no extra quota)
 
 ## Releases
 
